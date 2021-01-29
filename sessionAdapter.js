@@ -79,7 +79,7 @@ class SessionAdapter {
     fetch(`${this.baseURL}/dashboard`, {credentials: 'include'})
     .then(resp => resp.json())
     .then(json => {
-      this.container.innerHTML = json
+      this.container.innerHTML = json.content
     })
   }
 
@@ -87,7 +87,7 @@ class SessionAdapter {
     this.nav.classList = "navbar navbar-expand-lg navbar-light bg-light"
     this.nav.innerHTML = SessionTemplates.navbarHtml
     document.querySelector('#dashboard-link').addEventListener('click', this.loadDashboard)
-    document.querySelector('#games-link').addEventListener('click', () => console.log("TODO - go to usergames"))
+    document.querySelector('#games-link').addEventListener('click', UserGameAdapter.loadMyGamesPage)
     document.querySelector('#logout-button').addEventListener('click', this.logout)
   }
   
