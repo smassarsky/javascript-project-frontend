@@ -5,7 +5,7 @@ class SessionAdapter {
 
   static loadLandingPage = () => {
     this.nav.innerHTML = ""
-    this.container.innerHTML = SessionTemplates.landingPageHtml
+    this.container.innerHTML = SessionTemplates.landingPageHtml()
     this.preloginStyling()
     this.setAuthLinkListeners()
   }
@@ -17,13 +17,13 @@ class SessionAdapter {
   
   static loadLoginPage = (e) => {
     e.preventDefault()
-    this.container.innerHTML = SessionTemplates.loginHtml
+    this.container.innerHTML = SessionTemplates.loginHtml()
     document.querySelector('#login-form').addEventListener('submit', this.attemptLogin)
   }
   
   static loadSignupPage = (e) => {
     e.preventDefault()
-    this.container.innerHTML = SessionTemplates.signupHtml
+    this.container.innerHTML = SessionTemplates.signupHtml()
     document.querySelector('#signup-form').addEventListener('submit', this.attemptSignup)
   }
   
@@ -85,7 +85,7 @@ class SessionAdapter {
 
   static loadNavbar = () => {
     this.nav.classList = "navbar navbar-expand-lg navbar-light bg-light"
-    this.nav.innerHTML = SessionTemplates.navbarHtml
+    this.nav.innerHTML = SessionTemplates.navbarHtml()
     document.querySelector('#dashboard-link').addEventListener('click', this.loadDashboard)
     document.querySelector('#games-link').addEventListener('click', UserGameAdapter.loadMyGamesPage)
     document.querySelector('#logout-button').addEventListener('click', this.logout)

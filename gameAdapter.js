@@ -11,6 +11,7 @@ class GameAdapter {
     fetch(this.baseURL, { credentials: 'include' })
     .then(resp => resp.json())
     .then(json => {
+      Game.all = []
       json.forEach(game => new Game(game))
       this.loadSkeleton()
       this.populateDatalist()
@@ -22,7 +23,7 @@ class GameAdapter {
   }
 
   static loadSkeleton = () => {
-    this.container.innerHTML = GameTemplates.indexHtml
+    this.container.innerHTML = GameTemplates.indexHtml()
   }
 
   static populateDatalist = () => {

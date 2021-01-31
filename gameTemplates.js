@@ -1,21 +1,23 @@
 class GameTemplates {
-
-  static indexHtml = `
-    <div class="text-center my-3">
-      <h2>All Games</h2>
-      <p><i>Please pick a game:</i></p>
-      <div class="row justify-content-center">
-        <div class="col-sm-9 col-md-6 col-lg-3">
-          <input list="games-datalist" name="game-options" id="game-options" class="form-control">
+  
+  static indexHtml = () => {
+    return `
+      <div class="text-center my-3">
+        <h2>All Games</h2>
+        <p><i>Please pick a game:</i></p>
+        <div class="row justify-content-center">
+          <div class="col-sm-9 col-md-6 col-lg-3">
+            <input list="games-datalist" name="game-options" id="game-options" class="form-control">
+          </div>
         </div>
+        <datalist id="games-datalist">
+          <option value=""></option>
+        </datalist>
       </div>
-      <datalist id="games-datalist">
-        <option value=""></option>
-      </datalist>
-    </div>
-    <div id="show-game-div" class="justify-content-center">
-    </div>
-  `
+      <div id="show-game-div" class="justify-content-center">
+      </div>
+    `
+  } 
 
   static gameDivHtml(game) {
     const publishers = game.publishers.map(company => `<p>${company.name}</p>`).join('')

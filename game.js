@@ -2,6 +2,10 @@ class Game {
 
   static all = []
 
+  static findById = (id) => {
+    return this.all.find(game => game.id === id)
+  }
+
   constructor({id, name, release_date, url, cover_url, genres, publishers, developers}) {
     this.id = id
     this.name = name
