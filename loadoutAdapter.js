@@ -72,15 +72,12 @@ class LoadoutAdapter {
     e.preventDefault()
     switch(true) {
       case e.target.classList.contains("show-button"):
-        console.log("show button")
         this.loadoutShowPage(e.target.dataset.id)
         break
       case e.target.classList.contains("edit-name-button"):
-        console.log("edit name button")
         this.editNameRow(e.target.dataset.id)
         break
       case e.target.classList.contains("delete-button"):
-        console.log("delete button")
         this.deleteLoadout(e.target.dataset.id)
         break
     }
@@ -143,8 +140,23 @@ class LoadoutAdapter {
     const infoContainer = document.querySelector('#user-game-info-container')
     const loadout = Loadout.findById(parseInt(id))
     infoContainer.innerHTML = LoadoutTemplates.loadoutShowPageHtml(loadout)
-    LoadoutTemplates.loadItemsTableHtml(loadout)
+    this.fetchItemsAndIngredients(loadout)
     document.querySelector('#new-item-button').addEventListener('click', ItemTemplates.addItemForm)
+  }
+
+  static fetchItemsAndIngredients(loadout) {
+    fetch(`${this.baseURL}/${loadout.id}/items`, { credentials: 'include' })
+    .then(resp => resp.json())
+    .then(json => {
+      if (!json.error){
+        json['loadout_items'].forEach(loadoutItem => {
+          loadout.addOrUpdateItem(loadoutItem)
+        })
+        LoadoutTemplates.loadItemsTableHtml(loadout)
+      } else {
+        console.error("error")
+      }
+    })
   }
 
 }

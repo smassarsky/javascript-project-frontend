@@ -18,13 +18,17 @@ class ItemTemplates {
             <label for="new-item-name-${this.formCounter}" class="visually-hidden">New Item Name</label>
             <input id="new-item-name-${this.formCounter}" class="form-control" type="text" name="name" placeholder="Name">
           </td>
-          <td class="col-1">
+          <td class="col-2">
             <label for="new-item-quantity-${this.formCounter}" class="visually-hidden">New Item Quantity</label>
-            <input id="new-item-quantity-${this.formCounter}" class="form-control" type="number" name="quantity" placeholder="0">
+            <input id="new-item-quantity-${this.formCounter}" class="form-control" type="number" name="quantity" placeholder="0" min="0">
           </td>
-          <td class="
-          <td class="col-6">
-            <button type="submit" class="btn btn-sm btn-primary">Create Item</button>
+          <td class="col-4">
+            <label for="new-item-note-${this.formCounter}" class="visually-hidden">New Item Note</label>
+            <input id="new-item-note-${this.formCounter}" class="form-control" type="text" name="note" placeholder="Note">
+          </td>
+          <td class="col-3">
+            <button type="submit" class="btn btn-sm btn-primary me-3">Create Item</button>
+            <button id="remove-form-${this.formCounter}" class="btn btn-sm btn-primary">Remove</button>
           </td>
       </table>
     `

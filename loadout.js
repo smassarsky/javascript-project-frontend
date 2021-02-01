@@ -4,7 +4,7 @@ class Loadout {
 
   static findById = (id) => Loadout.all.find(loadout => loadout.id === id)
   static findIndexById = (id) => Loadout.all.indexOf(loadout => loadout.id === id)
-
+  
   constructor({id, name, items = []}) {
     const checkFirst = Loadout.findById(id)
       if (!checkFirst) {
@@ -21,12 +21,34 @@ class Loadout {
   }
 
   update = ({name, items=[]}) => {
-    this.name = name
-    items.forEach(item => this.items.push(new Item(item)))
+    console.log(items)
+    if (name) {
+      this.name = name
+    }
+    items.forEach(loadoutItem => {
+      if (!this.findItemById(loadoutItem.item.id)) {
+        this.items.push(new Item(item))
+      }
+    })
+  }
+
+  addOrUpdateItem = (loadoutItem) => {
+    const checkFirst = this.findItemById(loadoutItem.item.id)
+    const params = Object.assign({quantity: loadoutItem.quantity}, loadoutItem.item)
+    if (!checkFirst) {
+      this.items.push(new Item(params))
+    } else {
+      checkFirst.update(params)
+    }
   }
 
   destroy = () => {
     Loadout.all.splice(Loadout.findIndexById(this.id), 1)
+  }
+
+  findItemById = (id) => {
+    console.log(id, this)
+    return this.items.find(item => item.id === id)
   }
 
   static emptyLoadoutsRow = () => {
