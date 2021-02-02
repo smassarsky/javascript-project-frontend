@@ -26,13 +26,13 @@ class UserGame {
   }
 
   updateTasksAndLoadouts({tasks, loadouts}) {
-    this.tasks = []
-    this.loadouts = []
     if (tasks.length > 0){
+      this.tasks = []
       tasks.forEach(task => this.tasks.push(new Task(task)))
     }
     if (loadouts.length > 0) {
-      loadouts.forEach(loadout => this.loadouts.push(new Loadout(loadout)))
+      this.loadouts = []
+      loadouts.forEach(loadout => this.loadouts.push(new Loadout(Object.assign(loadout, {userGame: this}))))
     }
   }
 

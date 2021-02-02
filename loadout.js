@@ -5,22 +5,26 @@ class Loadout {
   static findById = (id) => Loadout.all.find(loadout => loadout.id === id)
   static findIndexById = (id) => Loadout.all.indexOf(loadout => loadout.id === id)
   
-  constructor({id, name, items = []}) {
+  constructor({id, name, loadoutItems = [], userGame}) {
     const checkFirst = Loadout.findById(id)
       if (!checkFirst) {
       this.id = id
       this.name = name
-      this.items = []
+      this.userGame = userGame
+      this.loadoutItems = []
 
-      items.forEach(item => this.items.push(new Item(item)))
+      loadoutItems.forEach(function(loadoutItem) {
+        console.log(this)
+        this.loadoutItems.push(new LoadoutItem(Object.assign(loadoutItem, {loadout: this})))
+      }, this)
       Loadout.all.push(this)
       return this
     } else {
-      return checkFirst
+      return checkFirst.update({name: name, loadoutItems: loadoutItems, userGameId: userGameId})
     }
   }
 
-  update = ({name, items=[]}) => {
+  update = ({name, items=[], userGameId}) => {
     console.log(items)
     if (name) {
       this.name = name
@@ -30,6 +34,19 @@ class Loadout {
         this.items.push(new Item(item))
       }
     })
+  }
+
+  addLoadoutItem = (loadoutItem) => {
+    const checkFirst = this.findLoadoutItemById(loadoutItem.id)
+    if (!checkFirst) {
+      this.loadoutItems.push(new LoadoutItem(Object.assign(loadoutItem, {loadout: this})))
+    } else {
+      checkFirst.update(loadoutItem)
+    }
+  }
+
+  removeLoadoutItem = (loadoutItem) => {
+    return this.loadoutItems.splice(this.loadoutItems.indexOf(testLoadoutItem => testLoadoutItem.id === loadoutItem.id), 1)
   }
 
   addOrUpdateItem = (loadoutItem) => {
@@ -45,6 +62,8 @@ class Loadout {
   destroy = () => {
     Loadout.all.splice(Loadout.findIndexById(this.id), 1)
   }
+
+  findLoadoutItemById = (id) => this.loadoutItems.find(item => item.id === id)
 
   findItemById = (id) => {
     console.log(id, this)

@@ -57,14 +57,14 @@ class LoadoutAdapter {
         document.querySelector('#loadout-error-div').innerHTML = json.error
       } else {
         e.target.remove()
-        this.addLoadoutToTable(json)
+        this.addLoadoutToTable(json, e.target.dataset.id)
       }
     })
     .catch(error => console.error(error))
   }
 
-  static addLoadoutToTable = (loadoutJson) => {
-    const loadoutObj = new Loadout(loadoutJson)
+  static addLoadoutToTable = (loadoutJson, userGameId) => {
+    const loadoutObj = new Loadout(Object.assign(loadoutJson, {userGameId: parseInt(userGameId)}))
     document.querySelector('#loadout-table-body').prepend(loadoutObj.renderTableRow())
   }
 
@@ -141,22 +141,29 @@ class LoadoutAdapter {
     const loadout = Loadout.findById(parseInt(id))
     infoContainer.innerHTML = LoadoutTemplates.loadoutShowPageHtml(loadout)
     this.fetchItemsAndIngredients(loadout)
-    document.querySelector('#new-item-button').addEventListener('click', ItemTemplates.addItemForm)
+    document.querySelector('#loadout-item-table-body').addEventListener('click', LoadoutItemAdapter.loadoutItemTableSwitcher)
+    document.querySelector('#new-loadout-item-button').addEventListener('click', LoadoutItemTemplates.newForm)
   }
 
   static fetchItemsAndIngredients(loadout) {
-    fetch(`${this.baseURL}/${loadout.id}/items`, { credentials: 'include' })
+    fetch(`${this.baseURL}/${loadout.id}/loadout_items`, { credentials: 'include' })
     .then(resp => resp.json())
     .then(json => {
       if (!json.error){
+        console.log(json)
         json['loadout_items'].forEach(loadoutItem => {
-          loadout.addOrUpdateItem(loadoutItem)
+          loadout.addLoadoutItem(loadoutItem)
         })
-        LoadoutTemplates.loadItemsTableHtml(loadout)
+        LoadoutTemplates.loadLoadoutItemsTableHtml(loadout)
       } else {
         console.error("error")
       }
     })
+  }
+
+  static resetItemTableMessages() {
+    document.querySelector('#loadout-item-success-div').innerHTML = ""
+    document.querySelector('#loadout-item-error-div').innerHTML = ""
   }
 
 }

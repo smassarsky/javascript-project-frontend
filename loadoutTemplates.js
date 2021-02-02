@@ -17,13 +17,15 @@ class LoadoutTemplates {
   static loadoutShowPageHtml = (loadout) => `
     <div id="loadout-header" class="text-center mt-3">
       <h2>${loadout.name} Loadout</h2>
-      <button id="new-item-button" data-id="${loadout.id}" class="btn btn-primary btn-sm me-3">New Item</button>
-      <button id="add-existing-item-button" data-id="${loadout.id}" class="btn btn-primary btn-sm">Add Existing Item</button
-      <div id="item-success-div" class="text-success"></div>
-      <div id="item-error-div" class="text-danger"></div>
+      <div class="mb-3">
+        <button id="new-loadout-item-button" data-id="${loadout.id}" class="btn btn-primary btn-sm me-3">New Loadout Item</button>
+        <button id="add-existing-loadout-item-button" data-id="${loadout.id}" class="btn btn-primary btn-sm">Add Existing Loadout Item</button>
+      </div>
+      <div id="loadout-item-success-div" class="text-success"></div>
+      <div id="loadout-item-error-div" class="text-danger"></div>
     </div>
-    <div id="item-table-container" class="container table-responsive">
-      <table id="item-table-headers" class="table text-center mb-0">
+    <div id="loadout-item-table-container" class="container table-responsive">
+      <table id="loadout-item-table-headers" class="table text-center mb-0">
         <thead>
           <tr>
             <th class="col-3">Name</th>
@@ -33,16 +35,16 @@ class LoadoutTemplates {
           </tr>
         </thead>
       </table>
-      <table class="table text-center"><tbody id="item-table-body"></tbody></table>
+      <table class="table text-center"><tbody id="loadout-item-table-body"></tbody></table>
     </div>
   `
 
-  static loadItemsTableHtml = (loadout) => {
-    const tbody = document.querySelector('#item-table-body')
+  static loadLoadoutItemsTableHtml = (loadout) => {
+    const tbody = document.querySelector('#loadout-item-table-body')
 
-    console.log(loadout.items.length)
-    if (loadout.items.length > 0) {
-      loadout.items.forEach(item => tbody.appendChild(item.itemTableRow()))
+    console.log(loadout.loadoutItems.length)
+    if (loadout.loadoutItems.length > 0) {
+      loadout.loadoutItems.forEach(loadoutItem => tbody.appendChild(loadoutItem.tableRow()))
     } else {
       tbody.innerHTML = `<tr id="no-item-holder"><td class="col-12">No Items Created Yet</td></tr>`
     }

@@ -6,17 +6,13 @@ class UserGameAdapter {
     if (e) {
       e.preventDefault()
     }
-    this.fetchMyGames()
-  }
-
-  static fetchMyGames = () => {
     fetch(this.baseURL, { credentials: 'include' })
-      .then(resp => resp.json())
-      .then(userGamesJson => {
-        userGamesJson.forEach(userGame => new UserGame(userGame))
-        this.appendUserGames()
-        this.setIndexListeners()
-      })
+    .then(resp => resp.json())
+    .then(userGamesJson => {
+      userGamesJson.forEach(userGame => new UserGame(userGame))
+      this.appendUserGames()
+      this.setIndexListeners()
+    })
   }
 
   static appendUserGames() {
@@ -69,7 +65,7 @@ class UserGameAdapter {
       if (json) {
         const userGame = new UserGame(json)
         this.container.innerHTML = UserGameTemplates.userGameShowHtml(userGame)
-        const cardsContainer = document.querySelector('#cards-container').appendChild(userGame.gameCard)
+        document.querySelector('#cards-container').appendChild(userGame.gameCard)
         document.querySelector('#tasks-div').innerHTML = userGame.renderTasksTable()
         document.querySelector('#loadouts-div').innerHTML = userGame.renderLoadoutTable()
         document.querySelector('#loadout-table-body').innerHTML = userGame.renderLoadoutTableData().innerHTML
