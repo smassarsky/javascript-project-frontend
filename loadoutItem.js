@@ -6,7 +6,6 @@ class LoadoutItem {
   static findIndexById = (id) => LoadoutItem.all.indexOf(loadoutItem => loadoutItem.id === id)
 
   constructor({id, quantity, item, loadout}) {
-    console.log(loadout)
     const checkFirst = LoadoutItem.findById(id)
     if (!checkFirst){
       this.id = id
@@ -60,7 +59,7 @@ class LoadoutItem {
   }
 
   optionButtons(options) {
-    return options.map(option => `<button data-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
+    return options.map(option => `<button data-loadout-item-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
   }
 
 }

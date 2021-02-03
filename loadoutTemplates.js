@@ -4,7 +4,7 @@ class LoadoutTemplates {
     return `
       <h4>New ${userGame.name} Loadout</h4>
       <div id="loadout-error-div" class="text-danger"></div>
-      <form id="new-loadout-form" data-id="${userGame.id}">
+      <form id="new-loadout-form" data-user-game-id="${userGame.id}">
         <label for="loadout-name" class="visually-hidden">Loadout Name</label>
         <input type="text" id="loadout-name" name="name" placeholder="name">
         <button type="submit" class="btn btn-primary">Create Loadout</button>
@@ -18,8 +18,8 @@ class LoadoutTemplates {
     <div id="loadout-header" class="text-center mt-3">
       <h2>${loadout.name} Loadout</h2>
       <div class="mb-3">
-        <button id="new-loadout-item-button" data-id="${loadout.id}" class="btn btn-primary btn-sm me-3">New Loadout Item</button>
-        <button id="add-existing-loadout-item-button" data-id="${loadout.id}" class="btn btn-primary btn-sm">Add Existing Loadout Item</button>
+        <button id="new-loadout-item-button" data-loadout-id="${loadout.id}" class="btn btn-primary btn-sm me-3">New Loadout Item</button>
+        <button id="add-existing-loadout-item-button" data-loadout-id="${loadout.id}" class="btn btn-primary btn-sm">Add Existing Loadout Item</button>
       </div>
       <div id="loadout-item-success-div" class="text-success"></div>
       <div id="loadout-item-error-div" class="text-danger"></div>
@@ -46,8 +46,10 @@ class LoadoutTemplates {
     if (loadout.loadoutItems.length > 0) {
       loadout.loadoutItems.forEach(loadoutItem => tbody.appendChild(loadoutItem.tableRow()))
     } else {
-      tbody.innerHTML = `<tr id="no-item-holder"><td class="col-12">No Items Created Yet</td></tr>`
+      tbody.innerHTML = this.noLoadoutItemsHtml()
     }
   }
+
+  static noLoadoutItemsHtml = () => `<tr id="no-loadout-item-holder"><td class="col-12">No Items Added to Loadout Yet</td></tr>`
 
 }

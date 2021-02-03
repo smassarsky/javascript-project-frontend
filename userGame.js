@@ -2,9 +2,8 @@ class UserGame {
 
   static all = []
 
-  static findById = (id) => {
-    return this.all.find(userGame => userGame.id === id)
-  }
+  static findById = (id) => this.all.find(userGame => userGame.id === id)
+
 
   constructor({id, game: { name, cover_url }, tasks = [], loadouts = []}) {
     const checkFirst = UserGame.all.find(userGame => userGame.id === id)
@@ -14,26 +13,66 @@ class UserGame {
       this.coverUrl = cover_url
       this.tasks = tasks
       this.loadouts = loadouts
+      this.fetchedAllItems = false
+      this.items = []
 
       this.gameCard = this.renderCard()
 
       UserGame.all.push(this)
       return this
     } else {
-      checkFirst.updateTasksAndLoadouts({tasks: tasks, loadouts: loadouts})
+      checkFirst.update({tasks: tasks, loadouts: loadouts})
       return checkFirst
     }
   }
 
-  updateTasksAndLoadouts({tasks, loadouts}) {
+
+  // lookup methods for related objects
+  findLoadoutById = (id) => this.loadouts.find(loadout => loadout.id === id)
+  findLoadoutIndexById = (id) => this.loadouts.indexOf(loadout => loadout.id === id)
+  findItemById = (id) => this.items.find(item => item.id === id)
+  findItemIndexById = (id) => this.items.indexOf(item => item.id === id)
+
+
+  update({tasks, loadouts}) {
     if (tasks.length > 0){
       this.tasks = []
       tasks.forEach(task => this.tasks.push(new Task(task)))
     }
     if (loadouts.length > 0) {
-      this.loadouts = []
-      loadouts.forEach(loadout => this.loadouts.push(new Loadout(Object.assign(loadout, {userGame: this}))))
+      loadouts.forEach(loadout => this.addLoadout(loadout))
     }
+  }
+
+  // add / remove methods for related objects
+  addLoadout = (loadoutJson) => {
+    const checkFirst = this.findLoadoutById(loadoutJson.id)
+    if (!checkFirst) {
+      this.loadouts.push(new Loadout(Object.assign(loadoutJson, {userGame: this})))
+      return this.loadouts[this.loadouts.length - 1]
+    } else {
+      checkFirst.update(loadoutJson)
+      return checkFirst
+    }
+  }
+
+  removeLoadout = (loadout) => {
+    this.loadouts.splice(this.findLoadoutIndexById(loadout.id), 1)
+  }
+
+  addItem = (itemJson) => {
+    const checkFirst = this.findItemById(itemJson.id)
+    if (!checkFirst) {
+      this.items.push(new Item(Object.assign(itemJson, { userGame: this })))
+      return this.items[this.items.length - 1]
+    } else {
+      checkFirst.update(itemJson)
+      return checkFirst
+    }
+  }
+
+  removeItem = (item) => {
+    this.items.splice(this.findItemIndexById(item.id), 1)
   }
 
   renderLoadoutTable = () => {
@@ -41,7 +80,7 @@ class UserGame {
     return `
       <div class="text-center">
         <h3>Loadouts</h3>
-        <button id="new-loadout-button" data-id="${this.id}" class="btn btn-primary">New Loadout</button>
+        <button id="new-loadout-button" data-user-game-id="${this.id}" class="btn btn-primary">New Loadout</button>
         <div id="loadout-success-div" class="text-success"></div>
         <div id="loadout-error-div" class="text-danger"></div>
       </div>
@@ -75,7 +114,7 @@ class UserGame {
     return `
       <div class="text-center">
         <h3>Tasks</h3>
-        <button id="new-task-button" data-id="${this.id}" class="btn btn-primary">New Task</button>
+        <button id="new-task-button" data-user-game-id="${this.id}" class="btn btn-primary">New Task</button>
       </div>
       <table class="table text-center">
         <thead>
@@ -94,7 +133,7 @@ class UserGame {
     const newCard = document.createElement('div')
     newCard.className = 'col'
     newCard.innerHTML = `
-      <div class="card user-game-card" data-id="${this.id}">
+      <div class="card user-game-card" data-user-game-id="${this.id}">
         <img src="${this.coverUrl}" class="card-img-top" alt="${this.name} Cover">
         <div class="card-body">
           <h5 class="card-title text-center">${this.name}</h5>

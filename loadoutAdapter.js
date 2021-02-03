@@ -3,8 +3,8 @@ class LoadoutAdapter {
   static baseURL = `${SessionAdapter.baseURL}/loadouts`
 
   static newLoadoutPage = (e) => {
-    console.log(e.target, e.target.dataset.id)
-    const userGame = UserGame.findById(parseInt(e.target.dataset.id))
+    console.log(e.target, e.target.dataset.id, e.target.dataset.userGameId)
+    const userGame = UserGame.findById(parseInt(e.target.dataset.userGameId))
     const infoContainer = document.querySelector('#user-game-info-container')
     infoContainer.innerHTML = LoadoutTemplates.newLoadoutHtml(userGame)
     document.querySelector('#new-loadout-form').addEventListener('submit', this.createNewLoadout)
@@ -18,7 +18,7 @@ class LoadoutAdapter {
     const newLoadoutForm = document.createElement('form')
     const numRows = document.querySelectorAll('#loadout-table-container form').length
     newLoadoutForm.id = `new-loadout-form-${numRows}`
-    newLoadoutForm.dataset.id = `${e.target.dataset.id}`
+    newLoadoutForm.dataset.userGameId = `${e.target.dataset.userGameId}`
     newLoadoutForm.innerHTML = 
     `
       <table class="table mb-0 text-center">
@@ -39,6 +39,7 @@ class LoadoutAdapter {
 
   static createNewLoadout = (e) => {
     e.preventDefault()
+    const userGame = UserGame.findById(parseInt(e.target.dataset.userGameId))
     fetch(this.baseURL, {
       method: "POST",
       credentials: 'include',
@@ -47,7 +48,7 @@ class LoadoutAdapter {
         Accept: 'application/json'
       },
       body: JSON.stringify({
-        user_game_id: parseInt(e.target.dataset.id),
+        user_game_id: userGame.id,
         name: e.target.name.value
       })
     })
@@ -57,28 +58,28 @@ class LoadoutAdapter {
         document.querySelector('#loadout-error-div').innerHTML = json.error
       } else {
         e.target.remove()
-        this.addLoadoutToTable(json, e.target.dataset.id)
+        this.addLoadoutToTable(json, userGame)
       }
     })
     .catch(error => console.error(error))
   }
 
-  static addLoadoutToTable = (loadoutJson, userGameId) => {
-    const loadoutObj = new Loadout(Object.assign(loadoutJson, {userGameId: parseInt(userGameId)}))
-    document.querySelector('#loadout-table-body').prepend(loadoutObj.renderTableRow())
+  static addLoadoutToTable = (loadoutJson, userGame) => {
+    const newLoadout = userGame.addLoadout(loadoutJson)
+    document.querySelector('#loadout-table-body').prepend(newLoadout.renderTableRow())
   }
 
   static loadoutTableSwitcher = (e) => {
     e.preventDefault()
     switch(true) {
       case e.target.classList.contains("show-button"):
-        this.loadoutShowPage(e.target.dataset.id)
+        this.loadoutShowPage(e.target.dataset.loadoutId)
         break
       case e.target.classList.contains("edit-name-button"):
-        this.editNameRow(e.target.dataset.id)
+        this.editNameRow(e.target.dataset.loadoutId)
         break
       case e.target.classList.contains("delete-button"):
-        this.deleteLoadout(e.target.dataset.id)
+        this.deleteLoadout(e.target.dataset.loadoutId)
         break
     }
   }
@@ -91,7 +92,7 @@ class LoadoutAdapter {
 
   static editLoadoutName = (e) => {
     e.preventDefault()
-    const loadout = Loadout.findById(parseInt(e.target.dataset.id))
+    const loadout = Loadout.findById(parseInt(e.target.dataset.loadoutId))
     fetch(`${this.baseURL}/${loadout.id}`, {
       method: "PATCH", 
       credentials: 'include',
@@ -143,6 +144,7 @@ class LoadoutAdapter {
     this.fetchItemsAndIngredients(loadout)
     document.querySelector('#loadout-item-table-body').addEventListener('click', LoadoutItemAdapter.loadoutItemTableSwitcher)
     document.querySelector('#new-loadout-item-button').addEventListener('click', LoadoutItemTemplates.newForm)
+    document.querySelector('#add-existing-loadout-item-button').addEventListener('click', LoadoutItemTemplates.addExistingForm)
   }
 
   static fetchItemsAndIngredients(loadout) {

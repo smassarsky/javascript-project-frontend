@@ -36,7 +36,7 @@ class GameTemplates {
               ${publishers || "<p>No publishers on record.</p>"}
               <h6>Developed by:</h6>
               ${developers || "<p>No developers on record.</p>"}
-              <button class="btn btn-primary" id="add-to-collection-button" data-id="${game.id}">Add to collection</button>
+              <button class="btn btn-primary" id="add-to-collection-button" data-game-id="${game.id}">Add to collection</button>
               <div id="add-game-error-div"></div>
             </div>
           </div>

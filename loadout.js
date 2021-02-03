@@ -20,20 +20,18 @@ class Loadout {
       Loadout.all.push(this)
       return this
     } else {
-      return checkFirst.update({name: name, loadoutItems: loadoutItems, userGameId: userGameId})
+      checkFirst.update({name: name, loadoutItems: loadoutItems})
+      return checkFirst
     }
   }
 
-  update = ({name, items=[], userGameId}) => {
-    console.log(items)
+  update = ({name, loadoutItems = []}) => {
+    console.log(loadoutItems)
     if (name) {
       this.name = name
     }
-    items.forEach(loadoutItem => {
-      if (!this.findItemById(loadoutItem.item.id)) {
-        this.items.push(new Item(item))
-      }
-    })
+    loadoutItems.forEach(loadoutItem => this.addLoadoutItem(loadoutItem))
+    return this
   }
 
   addLoadoutItem = (loadoutItem) => {
@@ -61,6 +59,7 @@ class Loadout {
 
   destroy = () => {
     Loadout.all.splice(Loadout.findIndexById(this.id), 1)
+    this.userGame.removeLoadout(this)
   }
 
   findLoadoutItemById = (id) => this.loadoutItems.find(item => item.id === id)
@@ -85,13 +84,13 @@ class Loadout {
   }
 
   optionButtons(options) {
-    return options.map(option => `<button data-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
+    return options.map(option => `<button data-loadout-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
   }
   
 
   editLoadoutNameForm = () => {
     const newEditLoadoutNameForm = document.createElement('form')
-    newEditLoadoutNameForm.dataset.id = this.id
+    newEditLoadoutNameForm.dataset.loadoutId = this.id
     newEditLoadoutNameForm.innerHTML = 
     `
       <table class="table mb-0 text-center">

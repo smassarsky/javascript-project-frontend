@@ -5,54 +5,46 @@ class Item {
   static findById = (id) => Item.all.find(item => item.id === id)
   static findIndexById = (id) => Item.all.indexOf(item => item.id === id)
 
-  constructor({id, name, note = "", ingredients = [], userGameId, loadoutId}) {
+  constructor({id, name, note = "", ingredients = [], userGame, loadoutItem}) {
     const checkFirst = Item.findById(id)
     if (!checkFirst){
       this.id = id
       this.name = name
       this.note = note
-      this.userGameId = userGameId
-      this.loadoutIds = [loadoutId]
+      this.userGame = userGame
+      this.loadoutItems = loadoutItem ? [loadoutItem] : [] 
       this.ingredients = []
 
-      ingredients.forEach(ingredient => this.ingredients.push(new Item(ingredient)))
+      if (ingredients && ingredients.length > 0) {
+        ingredients.forEach(ingredient => this.ingredients.push(new Item(ingredient)))
+      }
       Item.all.push(this)
       return this
     } else {
-      checkFirst.update({name: name, note: note, ingredients: ingredients})
+      checkFirst.update({name: name, note: note, ingredients: ingredients, loadoutItem: loadoutItem})
       return checkFirst
     }
   }
 
-  get userGame() {
-    return UserGame.findById(this.userGameId)
-  }
-
-  get loadouts() {
-    return this.loadoutIds.map(id => Loadout.findById(id))
-  }
-
-  update({name, note, ingredients = [], userGameId, loadoutId}) {
-    if (name && name != this.name) {
+  update({name, note, ingredients = [], loadoutItem}) {
+    if (name) {
       this.name = name
     }
-    if (note && note != this.note) {
+    if (note) {
       this.note = note
     }
     if (ingredients.length > 0 && ingredients.map(ing => ing.id) != this.ingredients.map(ing => ing.id)) {
       this.ingredients = []
       ingredients.forEach(ingredient => this.ingredients.push(new Item(ingredient)))
     }
-    if (userGameId && userGameId != this.userGameId) {
-      this.userGameId = userGameId
-    }
-    if (loadoutId && !this.loadoutIds.includes(loadoutId)) {
-      this.loadoutIds.push(loadoutId)
+    if (loadoutItem && !this.loadoutItemss.includes(loadoutItem)) {
+      this.loadoutItems.push(loadoutItem)
     }
   }
 
   destroy = () => {
     Item.all.splice(Item.findIndexById(this.id), 1)
+    this.loadoutItems.forEach(loadoutItem => loadoutItem.destroy())
   }
 
   itemTableRow = (...options) => {
@@ -71,7 +63,14 @@ class Item {
   }
 
   optionButtons(options) {
-    return options.map(option => `<button data-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
+    return options.map(option => `<button data-item-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
+  }
+
+  optionElement = () => {
+    const element = document.createElement('option')
+    element.value = this.id
+    element.innerHTML = this.name
+    return element
   }
 
 }

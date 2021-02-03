@@ -4,7 +4,7 @@ class ItemAdapter {
 
   static createNewItem = (e) => {
     e.preventDefault()
-    const loadout = Loadout.findById(parseInt(e.target.dataset.id))
+    const loadout = Loadout.findById(parseInt(e.target.dataset.loadoutId))
     fetch(ItemAdapter.baseURL, {
       method: "POST",
       credentials: "include",
@@ -13,7 +13,7 @@ class ItemAdapter {
         Accept: 'application/json'
       },
       body: JSON.stringify({
-        loadout_id: e.target.dataset.id,
+        loadout_id: loadout.id,
         item: {
           name: e.target.name.value,
           quantity: parseInt(e.target.quantity.value),
@@ -51,10 +51,10 @@ class ItemAdapter {
         console.log("toggle ingredients")
         break
       case (e.target.classList.contains("edit-button")):
-        this.editRow(e.target.dataset.id)
+        this.editRow(e.target.dataset.itemId)
         break
       case (e.target.classList.contains("delete-button")):
-        this.deleteItem(e.target.dataset.id)
+        this.deleteItem(e.target.dataset.itemId)
         break
 
     }
@@ -68,8 +68,8 @@ class ItemAdapter {
 
   static removeEditRow = (e) => {
     e.preventDefault()
-    const targetItem = Item.findById(parseInt(e.target.dataset.id))
-    document.querySelector(`#edit-item-form-${e.target.dataset.id}`).remove()
+    const targetItem = Item.findById(parseInt(e.target.dataset.itemId))
+    document.querySelector(`#edit-item-form-${e.target.dataset.itemId}`).remove()
     document.querySelector('#item-table-body').prepend(targetItem.itemTableRow())
   }
 
@@ -94,6 +94,17 @@ class ItemAdapter {
   static resetMessages() {
     document.querySelector('#item-success-div').innerHTML = ""
     document.querySelector('#item-error-div').innerHTML = ""
+  }
+
+  static fetchUserGameItemsTruncated = (userGame) => {
+    if (!userGame.fetchedAllItems) {
+      return fetch(`${UserGameAdapter.baseURL}/${userGame.id}/items`, { credentials: 'include'})
+      .then(resp => resp.json())
+      .then(json => {
+        json.forEach(itemJson => userGame.addItem(itemJson))
+        return json
+      })
+    }
   }
 
 }

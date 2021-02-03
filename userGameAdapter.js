@@ -39,7 +39,7 @@ class UserGameAdapter {
       },
       body: JSON.stringify({
         game: {
-          id: e.target.dataset.id
+          id: e.target.dataset.gameId
         }
       })
     })
@@ -53,7 +53,9 @@ class UserGameAdapter {
   }
 
   static loadShowUserGamePage = (e) => {
-    fetch(`${this.baseURL}/${e.currentTarget.dataset.id}`, { credentials: 'include' })
+    const userGame = UserGame.findById(parseInt(e.currentTarget.dataset.userGameId))
+    console.log(e.currentTarget, userGame)
+    fetch(`${this.baseURL}/${userGame.id}`, { credentials: 'include' })
     .then(resp => {
       if (resp.ok) {
         return resp.json()
@@ -63,7 +65,8 @@ class UserGameAdapter {
     })
     .then(json => {
       if (json) {
-        const userGame = new UserGame(json)
+        console.log(json)
+        userGame.update(json)
         this.container.innerHTML = UserGameTemplates.userGameShowHtml(userGame)
         document.querySelector('#cards-container').appendChild(userGame.gameCard)
         document.querySelector('#tasks-div').innerHTML = userGame.renderTasksTable()
@@ -79,5 +82,9 @@ class UserGameAdapter {
     document.querySelector('#new-loadout-button').addEventListener('click', LoadoutAdapter.newLoadoutFormRow)
     document.querySelector('#loadout-table-body').addEventListener('click', LoadoutAdapter.loadoutTableSwitcher)
   }
+
+  // static loadAllItems = (userGame) => {
+  //   fetch(`${this.baseURL}/${}`)
+  // }
 
 }

@@ -9,7 +9,7 @@ class ItemTemplates {
     }
     const newItemForm = document.createElement('form')
     newItemForm.id = `new-item-form-${this.formCounter}`
-    newItemForm.dataset.id = `${e.target.dataset.id}`
+    newItemForm.dataset.loadoutId = `${e.target.dataset.loadoutId}`
     newItemForm.innerHTML = 
     `
       <table class="table mb-0 text-center">
@@ -43,7 +43,7 @@ class ItemTemplates {
   static editItemForm = (item) => {
     const newEditItemForm = document.createElement('form')
     newEditItemForm.id = `edit-item-form-${item.id}`
-    newEditItemForm.dataset.id = `${item.id}`
+    newEditItemForm.dataset.itemId = `${item.id}`
     newEditItemForm.innerHTML = 
     `
       <table class="table mb-0 text-center">
@@ -62,7 +62,7 @@ class ItemTemplates {
           </td>
           <td class="col-3">
             <button type="submit" class="btn btn-sm btn-primary me-3">Edit Item</button>
-            <button id="remove-edit-form-${item.id}" data-id="${item.id}" type="button" class="btn btn-sm btn-primary">Cancel</button>
+            <button id="remove-edit-form-${item.id}" data-item-id="${item.id}" type="button" class="btn btn-sm btn-primary">Cancel</button>
           </td>
         </tr>
       </table>
