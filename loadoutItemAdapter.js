@@ -2,15 +2,16 @@ class LoadoutItemAdapter {
  
   static baseURL = `${SessionAdapter.baseURL}/loadout_items`
 
-  static createLoadoutItem = ({loadout, quantity, itemId, name, note}) => {
-    let itemAttributes = { user_game_id: loadout.userGame.id }
+  // method used to create LoadoutItem with new or existing Item
+  static createLoadoutItem = ({loadout, quantity, itemId, name, note, target}) => {
+    this.resetMessages()
+    let itemAttributes
     if (itemId) {
-      itemAttributes = Object.assign(itemAttributes, { id: itemId })
+      itemAttributes = { item_id: itemId }
     } else {
-      itemAttributes = Object.assign(itemAttributes, { name: name, note: note })
+      itemAttributes = { item_attributes: {name: name, note: note, user_game_id: loadout.userGame.id }}
     }
-    console.log(itemAttributes)
-    return fetch(`${LoadoutAdapter.baseURL}/${loadout.id}/loadout_items`, {
+    fetch(`${this.baseURL}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -18,70 +19,53 @@ class LoadoutItemAdapter {
         Accept: 'application/json'
       },
       body: JSON.stringify({
-        loadout_item: {
-          quantity: quantity,
-          item_attributes: itemAttributes
-        }
-      })
-    })
-    .then(resp => resp.json())
-  }
-
-  static addLoadoutItemNew = (e) => {
-    e.preventDefault()
-    const loadout = Loadout.findById(parseInt(e.target.dataset.loadoutId))
-    fetch(`${LoadoutAdapter.baseURL}/${loadout.id}/loadout_items`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify({
-        loadout_item: {
-          quantity: parseInt(e.target.quantity.value),
-          item_attributes: {
-            name: e.target.name.value,
-            note: e.target.note.value,
-            user_game_id: loadout.userGame.id
-          }
-        }
+        loadout_item: Object.assign({
+          loadout_id: loadout.id,
+          quantity: quantity
+        }, itemAttributes)
       })
     })
     .then(resp => resp.json())
     .then(json => {
-      console.log(json)
       if (!json.error) {
-        const newLoadoutItem = new LoadoutItem(Object.assign(json, {loadout: loadout}))
-        loadout.addLoadoutItem(newLoadoutItem)
-        if (document.querySelector('#no-loadout-item-holder')) {
-          document.querySelector('#no-loadout-item-holder').remove()
-        }
-        e.target.remove()
+        const newLoadoutItem = loadout.addLoadoutItem(json)
+        target.remove()
         document.querySelector('#loadout-item-table-body').prepend(newLoadoutItem.tableRow())
-        document.querySelector('#loadout-item-success-div').innerHTML = "Item Created!"
+        this.success("Loadout Item Added!")
       } else {
-        document.querySelector('#loadout-item-error-div').innerHTML = json.error
+        this.failure(json.error)
       }
     })
   }
 
+  // create LoadoutItem with new Item
+  static addLoadoutItemNew = (e) => {
+    e.preventDefault()
+    const loadout = Loadout.findById(parseInt(e.target.dataset.loadoutId))
+    this.createLoadoutItem({
+      loadout: loadout,
+      quantity: e.target.quantity.value,
+      name: e.target.name.value,
+      note: e.target.note.value,
+      target: e.target
+    })
+  }
+
+  // create LoadoutItem with existing Item
   static addLoadoutItemExisting = (e) => {
     e.preventDefault()
     const loadout = Loadout.findById(parseInt(e.target.dataset.loadoutId))
-    this.createLoadoutItem({loadout: loadout, 
-                            quantity: e.target.quantity.value,
-                            itemId: e.target.name.value})
-    .then(json => {
-      console.log(json, loadout)
-      loadout.addLoadoutItem(json)
+    this.createLoadoutItem({
+      loadout: loadout, 
+      quantity: e.target.quantity.value,
+      itemId: e.target.name.value,
+      target: e.target
     })
-    
-    //{loadout, quantity, item, name, note}
   }
 
   static editLoadoutItem = (e) => {
     e.preventDefault()
+    this.resetMessages()
     const loadoutItem = LoadoutItem.findById(parseInt(e.target.dataset.loadoutItemId))
     fetch(`${this.baseURL}/${loadoutItem.id}`, {
       method: 'PATCH',
@@ -104,17 +88,14 @@ class LoadoutItemAdapter {
     .then(resp => resp.json())
     .then(json => {
       if (!json.error) {
-        console.log(json)
         loadoutItem.update(json)
         e.target.remove()
         document.querySelector('#loadout-item-table-body').prepend(loadoutItem.tableRow())
-        document.querySelector('#loadout-item-success-div').innerHTML = "Item Updated!"
+        this.success("Item Updated!")
       } else {
-        document.querySelector('#loadout-item-error-div').innerHTML = json.error
+        this.failure(json.error)
       }
     })
-
-    console.log("edit loadout item")
   }
 
   static removeLoadoutItemForm = (e) => {
@@ -125,14 +106,17 @@ class LoadoutItemAdapter {
   static loadoutItemTableSwitcher = (e) => {
     e.preventDefault()
     switch (true) {
-      case (e.target.classList.contains("ingredients-button")):
-        console.log("toggle ingredients")
-        break
       case (e.target.classList.contains("edit-button")):
         this.editRow(e.target.dataset.loadoutItemId)
         break
       case (e.target.classList.contains("delete-button")):
         this.deleteLoadoutItem(e.target.dataset.loadoutItemId)
+        break
+      case (e.target.classList.contains("new-ingredient-button")):
+        console.log("TODO new ingredient")
+        break
+      case (e.target.classList.contains("existing-ingredient-button")):
+        console.log("TODO existing ingredient")
         break
     }
   }
@@ -161,11 +145,11 @@ class LoadoutItemAdapter {
     .then(resp => resp.json())
     .then(json => {
       if (!json.error) {
-        document.querySelector('#loadout-item-success-div').innerHTML = "Loadout Item Deleted"
+        this.success("Loadout Item Deleted")
         document.querySelector(`#loadout-item-row-${loadoutItemToDelete.id}`).remove()
         loadoutItemToDelete.destroy()
       } else {
-        document.querySelector('#loadout-item-error-div').innerHTML = json.error
+        this.failure(json.error)
       }
     })
   }
@@ -173,6 +157,14 @@ class LoadoutItemAdapter {
   static resetMessages() {
     document.querySelector('#loadout-item-success-div').innerHTML = ""
     document.querySelector('#loadout-item-error-div').innerHTML = ""
+  }
+
+  static success(message) {
+    document.querySelector('#loadout-item-success-div').innerHTML = message
+  }
+
+  static failure(message) {
+    document.querySelector('#loadout-item-error-div').innerHTML = message
   }
 
 }

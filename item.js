@@ -30,7 +30,7 @@ class Item {
     if (name) {
       this.name = name
     }
-    if (note) {
+    if (note != undefined) {
       this.note = note
     }
     if (ingredients.length > 0 && ingredients.map(ing => ing.id) != this.ingredients.map(ing => ing.id)) {

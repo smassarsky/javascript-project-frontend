@@ -21,6 +21,17 @@ class LoadoutItem {
     }
   }
 
+  update({quantity, item}) {
+    this.quantity = quantity
+    this.item = new Item(item)
+    return this
+  }
+
+  destroy = () => {
+    LoadoutItem.all.splice(LoadoutItem.findIndexById(this.id), 1)
+    this.loadout.removeLoadoutItem(this)
+  }
+
   get name() {
     return this.item.name
   }
@@ -32,34 +43,62 @@ class LoadoutItem {
   get userGame() {
     return this.loadout.userGame
   }
+
+  get itemId() {
+    return this.item.id
+  }
   
-  update({quantity, item}) {
-    this.quantity = quantity
-    this.item = new Item(item)
-  }
-
-  destroy = () => {
-    LoadoutItem.all.splice(LoadoutItem.findIndexById(this.id), 1)
-    this.loadout.removeLoadoutItem(this)
-  }
-
   tableRow = (...options) => {
-    if (options.length === 0) {
-      options = ["Ingredients", "Edit", "Delete"]
-    }
-    const row = document.createElement('tr')
-    row.id = `loadout-item-row-${this.id}`
-    row.innerHTML = `
-      <td class="col-3">${this.name}</td>
-      <td class="col-2">${this.quantity}</td>
-      <td class="col-4">${this.note}</td>
-      <td class="col-3">${this.optionButtons(options)}</td>
+    // if (options.length === 0) {
+    //   options = ["Ingredients", "Edit", "Delete"]
+    // }
+
+    const div = document.createElement('div')
+    div.id = `loadout-item-div-${this.id}`
+    div.classList.add('border-bottom', 'bootstrap-table-border')
+    const detailTable = document.createElement('table')
+    detailTable.classList.add('table', 'mb-0', 'accordion-table')
+    div.appendChild(detailTable)
+    detailTable.id = `loadout-item-row-${this.id}`
+    detailTable.innerHTML = `
+      <tr>
+        <td class="col-3">${this.name}</td>
+        <td class="col-2">${this.quantity}</td>
+        <td class="col-4">${this.note}</td>
+        <td class="col-3">${this.optionButtons()}</td>
+      </tr>
     `
-    return row
+
+    const ingredientDiv = document.createElement('div')
+    div.appendChild(ingredientDiv)
+    ingredientDiv.id = `loadout-item-ingredient-div-${this.id}`
+    ingredientDiv.classList.add('collapse')
+    const ingredientHeader = document.createElement('h3')
+    ingredientHeader.innerText = "Ingredients"
+    ingredientDiv.appendChild(ingredientHeader)
+    const headerOptions = document.createElement('div')
+    ingredientDiv.appendChild(headerOptions)
+    headerOptions.innerHTML = `
+      <button type="button" id="add-new-ingredient-${this.id}" class="btn btn-sm btn-primary me-3 new-ingredient-button">Add New Ingredient</button>
+      <button type="button" id="add-existing-ingredient-${this.id}" class="btn btn-sm btn-primary existing-ingredient-button">Add Existing Ingredient</button>
+    `
+
+    const ingredientsTableHolder = document.createElement('div')
+
+
+    return div
   }
 
-  optionButtons(options) {
-    return options.map(option => `<button data-loadout-item-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
+  // optionButtons(options) {
+  //   return options.map(option => `<button type="button" data-loadout-item-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
+  // }
+
+  optionButtons() {
+    return `
+      <button type="button" data-bs-toggle="collapse" data-bs-target="#loadout-item-ingredient-div-${this.id}" data-loadout-item-id="${this.id}" class="btn btn-sm btn-primary me-3 ingredient-toggle-button">Ingredients</button>
+      <button type="button" data-loadout-item-id="${this.id}" class="btn btn-sm btn-primary me-3 edit-button">Edit</button>
+      <button type="button" data-loadout-item-id="${this.id}" class="btn btn-sm btn-primary me-3 delete-button">Delete</button>
+    `
   }
 
 }

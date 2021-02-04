@@ -38,23 +38,14 @@ class Loadout {
     const checkFirst = this.findLoadoutItemById(loadoutItem.id)
     if (!checkFirst) {
       this.loadoutItems.push(new LoadoutItem(Object.assign(loadoutItem, {loadout: this})))
+      return this.loadoutItems[this.loadoutItems.length - 1]
     } else {
-      checkFirst.update(loadoutItem)
+      return checkFirst.update(loadoutItem)
     }
   }
 
   removeLoadoutItem = (loadoutItem) => {
     return this.loadoutItems.splice(this.loadoutItems.indexOf(testLoadoutItem => testLoadoutItem.id === loadoutItem.id), 1)
-  }
-
-  addOrUpdateItem = (loadoutItem) => {
-    const checkFirst = this.findItemById(loadoutItem.item.id)
-    const params = Object.assign({quantity: loadoutItem.quantity}, loadoutItem.item)
-    if (!checkFirst) {
-      this.items.push(new Item(params))
-    } else {
-      checkFirst.update(params)
-    }
   }
 
   destroy = () => {

@@ -44,7 +44,7 @@ class LoadoutItemTemplates {
   static editForm = (loadoutItem) => {
     const newEditForm = document.createElement('form')
     newEditForm.id = `edit-loadout-item-form-${loadoutItem.id}`
-    newEditForm.dataset.loadoutId = `${loadoutItem.id}`
+    newEditForm.dataset.loadoutItemId = `${loadoutItem.id}`
     newEditForm.innerHTML = 
     `
       <table class="table mb-0 text-center">

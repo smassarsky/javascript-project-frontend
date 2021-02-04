@@ -19,3 +19,11 @@
 .user-game-card {
   cursor: pointer;
 }
+
+.accordion-table>:not(caption)>*>* {
+  border-bottom-width: 0px;
+}
+
+.bootstrap-table-border {
+  border-color: #dee2e6;
+}
