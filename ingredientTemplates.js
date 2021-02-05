@@ -1,7 +1,19 @@
 class IngredientTemplates {
 
   static headerButtons = () => {
-    return 
+    return
+  }
+
+  static newIngredientForm = () => {
+
+  }
+
+  static existingIngredientForm = () => {
+
+  }
+
+  static ingredientsTable = () => {
+    
   }
 
 }

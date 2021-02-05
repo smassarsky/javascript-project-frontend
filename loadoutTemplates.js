@@ -24,7 +24,7 @@ class LoadoutTemplates {
       <div id="loadout-item-success-div" class="text-success"></div>
       <div id="loadout-item-error-div" class="text-danger"></div>
     </div>
-    <div id="loadout-item-table-container" class="container table-responsive">
+    <div id="loadout-item-table-container" class="table-responsive">
       <table id="loadout-item-table-headers" class="table text-center mb-0">
         <thead>
           <tr>
@@ -35,21 +35,24 @@ class LoadoutTemplates {
           </tr>
         </thead>
       </table>
-      <table class="table text-center"><tbody id="loadout-item-table-body"></tbody></table>
+      <div id="loadout-item-table-holder"></div>
     </div>
   `
 
   static loadLoadoutItemsTableHtml = (loadout) => {
-    const tbody = document.querySelector('#loadout-item-table-body')
+    const tableHolder = document.querySelector('#loadout-item-table-holder')
 
-    console.log(loadout.loadoutItems.length)
     if (loadout.loadoutItems.length > 0) {
-      loadout.loadoutItems.forEach(loadoutItem => tbody.appendChild(loadoutItem.tableRow()))
+      loadout.loadoutItems.forEach(loadoutItem => tableHolder.appendChild(loadoutItem.tableDiv))
     } else {
-      tbody.innerHTML = this.noLoadoutItemsHtml()
+      tableHolder.innerHTML = this.noLoadoutItemsHtml()
     }
   }
 
-  static noLoadoutItemsHtml = () => `<tr id="no-loadout-item-holder"><td class="col-12">No Items Added to Loadout Yet</td></tr>`
+  static noLoadoutItemsHtml = () => `
+    <table id="no-loadout-item-holder">
+      <tbody><tr><td class="col-12">No Items Added to Loadout Yet</td></tr></tbody>
+    </table>
+  `
 
 }

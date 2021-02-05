@@ -4,7 +4,7 @@ class LoadoutItemAdapter {
 
   // method used to create LoadoutItem with new or existing Item
   static createLoadoutItem = ({loadout, quantity, itemId, name, note, target}) => {
-    this.resetMessages()
+    loadout.resetMessages()
     let itemAttributes
     if (itemId) {
       itemAttributes = { item_id: itemId }
@@ -30,10 +30,10 @@ class LoadoutItemAdapter {
       if (!json.error) {
         const newLoadoutItem = loadout.addLoadoutItem(json)
         target.remove()
-        document.querySelector('#loadout-item-table-body').prepend(newLoadoutItem.tableRow())
-        this.success("Loadout Item Added!")
+        loadout.loadoutItemTableHolder.prepend(newLoadoutItem.tableDiv)
+        loadout.success("Loadout Item Added!")
       } else {
-        this.failure(json.error)
+        loadout.failure(json.error)
       }
     })
   }
@@ -65,8 +65,8 @@ class LoadoutItemAdapter {
 
   static editLoadoutItem = (e) => {
     e.preventDefault()
-    this.resetMessages()
     const loadoutItem = LoadoutItem.findById(parseInt(e.target.dataset.loadoutItemId))
+    loadoutItem.resetMessages()
     fetch(`${this.baseURL}/${loadoutItem.id}`, {
       method: 'PATCH',
       credentials: 'include',
@@ -89,25 +89,36 @@ class LoadoutItemAdapter {
     .then(json => {
       if (!json.error) {
         loadoutItem.update(json)
-        e.target.remove()
-        document.querySelector('#loadout-item-table-body').prepend(loadoutItem.tableRow())
-        this.success("Item Updated!")
+        e.target.replaceWith(loadoutItem.tableDiv)
+        loadoutItem.success("Item Updated!")
       } else {
-        this.failure(json.error)
+        loadoutItem.failure(json.error)
       }
     })
   }
 
   static removeLoadoutItemForm = (e) => {
-    e.preventDefault()
     document.querySelector(`#loadout-item-form-${e.target.dataset.counter}`).remove()
   }
 
   static loadoutItemTableSwitcher = (e) => {
-    e.preventDefault()
     switch (true) {
+      case (e.target.classList.contains("new-loadout-item-button")):
+        LoadoutItemTemplates.newForm(e.target.dataset.loadoutId)
+        break
+      case (e.target.classList.contains("existing-loadout-item-button")):
+        LoadoutItemTemplates.addExistingForm(e.target.dataset.loadoutId)
+        console.log("make existing loadout item")
+        break
+      case (e.target.classList.contains("remove-form-button")):
+        this.removeLoadoutItemForm(e)
+        console.log("remove new form button")
+        break
       case (e.target.classList.contains("edit-button")):
         this.editRow(e.target.dataset.loadoutItemId)
+        break
+      case (e.target.classList.contains("cancel-edit-button")):
+        this.removeEditRow(e.target.dataset.loadoutItemId)
         break
       case (e.target.classList.contains("delete-button")):
         this.deleteLoadoutItem(e.target.dataset.loadoutItemId)
@@ -122,22 +133,20 @@ class LoadoutItemAdapter {
   }
 
   static editRow = (id) => {
-    this.resetMessages()
-    const loadoutItemToEdit = LoadoutItem.findById(parseInt(id))
-    document.querySelector('#loadout-item-table-headers').after(LoadoutItemTemplates.editForm(loadoutItemToEdit))
-    document.querySelector(`#loadout-item-row-${id}`).remove()
+    const loadoutItemToEdit = LoadoutItem.findById(id)
+    loadoutItemToEdit.resetMessages()
+    loadoutItemToEdit.tableDiv.replaceWith(loadoutItemToEdit.renderEditForm())
   }
 
-  static removeEditRow = (e) => {
-    e.preventDefault()
-    const targetLoadoutItem = LoadoutItem.findById(parseInt(e.target.dataset.loadoutItemId))
-    document.querySelector(`#edit-loadout-item-form-${e.target.dataset.loadoutItemId}`).remove()
-    document.querySelector('#loadout-item-table-body').prepend(targetLoadoutItem.tableRow())
+  static removeEditRow = (loadoutItemId) => {
+    const targetLoadoutItem = LoadoutItem.findById(loadoutItemId)
+    targetLoadoutItem.editForm.replaceWith(targetLoadoutItem.tableDiv)
   }
 
   static deleteLoadoutItem = (id) => {
-    this.resetMessages()
     const loadoutItemToDelete = LoadoutItem.findById(parseInt(id))
+    loadoutItemToDelete.resetMessages()
+    
     fetch(`${this.baseURL}/${id}`, {
       method: "DELETE",
       credentials: "include"
@@ -145,26 +154,13 @@ class LoadoutItemAdapter {
     .then(resp => resp.json())
     .then(json => {
       if (!json.error) {
-        this.success("Loadout Item Deleted")
-        document.querySelector(`#loadout-item-row-${loadoutItemToDelete.id}`).remove()
+        loadoutItemToDelete.success("Loadout Item Deleted")
+        loadoutItemToDelete.tableDiv.remove()
         loadoutItemToDelete.destroy()
       } else {
-        this.failure(json.error)
+        loadoutItemToDelete.failure(json.error)
       }
     })
-  }
-
-  static resetMessages() {
-    document.querySelector('#loadout-item-success-div').innerHTML = ""
-    document.querySelector('#loadout-item-error-div').innerHTML = ""
-  }
-
-  static success(message) {
-    document.querySelector('#loadout-item-success-div').innerHTML = message
-  }
-
-  static failure(message) {
-    document.querySelector('#loadout-item-error-div').innerHTML = message
   }
 
 }

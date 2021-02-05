@@ -65,14 +65,11 @@ class UserGameAdapter {
     })
     .then(json => {
       if (json) {
-        console.log(json)
+
+        
         userGame.update(json)
-        this.container.innerHTML = UserGameTemplates.userGameShowHtml(userGame)
-        document.querySelector('#cards-container').appendChild(userGame.gameCard)
-        document.querySelector('#tasks-div').innerHTML = userGame.renderTasksTable()
-        document.querySelector('#loadouts-div').innerHTML = userGame.renderLoadoutTable()
-        document.querySelector('#loadout-table-body').innerHTML = userGame.renderLoadoutTableData().innerHTML
-        this.setShowPageListeners(userGame)
+        this.container.innerHTML = ""
+        this.container.append(userGame.userGameShowContainer)
       }
     })
   }
@@ -83,8 +80,5 @@ class UserGameAdapter {
     document.querySelector('#loadout-table-body').addEventListener('click', LoadoutAdapter.loadoutTableSwitcher)
   }
 
-  // static loadAllItems = (userGame) => {
-  //   fetch(`${this.baseURL}/${}`)
-  // }
 
 }

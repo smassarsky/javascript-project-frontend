@@ -22,4 +22,11 @@ class UserGameTemplates {
       </div>
     `
   }
+
+  static noLoadoutHolder = () => {
+    return `
+      <table><tbody><tr><td>No Loadouts Created Yet</td></tr></tbody></table>
+    `
+  }
+
 }
