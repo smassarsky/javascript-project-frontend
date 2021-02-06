@@ -150,8 +150,7 @@ class LoadoutAdapter {
 
   static loadoutShowPage(id) {
     const loadout = Loadout.findById(id)
-    loadout.renderShowPage()
-    loadout.userGame.infoContainer.replaceWith(loadout.loadoutShowDiv)
+    loadout.userGame.infoContainer.replaceWith(loadout.showDiv)
     this.fetchItemsAndIngredients(loadout)
   }
 
@@ -163,7 +162,7 @@ class LoadoutAdapter {
         json['loadout_items'].forEach(loadoutItem => {
           loadout.addLoadoutItem(loadoutItem)
         })
-        loadout.renderLoadoutItemTable()
+        loadout.reRenderTableBody()
       } else {
         console.error("error")
       }

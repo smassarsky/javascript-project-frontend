@@ -29,9 +29,9 @@ class UserGame {
 
   // lookup methods for related objects
   findLoadoutById = (id) => this.loadouts.find(loadout => loadout.id === id)
-  findLoadoutIndexById = (id) => this.loadouts.indexOf(loadout => loadout.id === id)
+  findLoadoutIndexById = (id) => this.loadouts.findIndex(loadout => loadout.id === id)
   findItemById = (id) => this.items.find(item => item.id === id)
-  findItemIndexById = (id) => this.items.indexOf(item => item.id === id)
+  findItemIndexById = (id) => this.items.findIndex(item => item.id === id)
 
 
   update({tasks, loadouts}) {

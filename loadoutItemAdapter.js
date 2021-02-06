@@ -29,6 +29,7 @@ class LoadoutItemAdapter {
     .then(json => {
       if (!json.error) {
         const newLoadoutItem = loadout.addLoadoutItem(json)
+        console.log(newLoadoutItem)
         target.remove()
         loadout.loadoutItemTableHolder.prepend(newLoadoutItem.tableDiv)
         loadout.success("Loadout Item Added!")
@@ -124,9 +125,12 @@ class LoadoutItemAdapter {
         this.deleteLoadoutItem(e.target.dataset.loadoutItemId)
         break
       case (e.target.classList.contains("new-ingredient-button")):
+        Item.findById(e.target.dataset.itemId).newIngredientForm()
         console.log("TODO new ingredient")
         break
       case (e.target.classList.contains("existing-ingredient-button")):
+        const item = Item.findById(e.target.dataset.itemId)
+        item.existingIngredientForm()
         console.log("TODO existing ingredient")
         break
     }
@@ -134,6 +138,7 @@ class LoadoutItemAdapter {
 
   static editRow = (id) => {
     const loadoutItemToEdit = LoadoutItem.findById(id)
+    console.log(loadoutItemToEdit, id)
     loadoutItemToEdit.resetMessages()
     loadoutItemToEdit.tableDiv.replaceWith(loadoutItemToEdit.renderEditForm())
   }
@@ -144,7 +149,7 @@ class LoadoutItemAdapter {
   }
 
   static deleteLoadoutItem = (id) => {
-    const loadoutItemToDelete = LoadoutItem.findById(parseInt(id))
+    const loadoutItemToDelete = LoadoutItem.findById(id)
     loadoutItemToDelete.resetMessages()
     
     fetch(`${this.baseURL}/${id}`, {

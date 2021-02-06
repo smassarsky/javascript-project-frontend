@@ -4,7 +4,7 @@ class Loadout {
 
   static findById = (id) => Loadout.all.find(loadout => loadout.id === parseInt(id))
   
-  static findIndexById = (id) => Loadout.all.indexOf(loadout => loadout.id === parseInt(id))
+  static findIndexById = (id) => Loadout.all.findIndex(loadout => loadout.id === parseInt(id))
   
   constructor({id, name, loadoutItems = [], userGame}) {
     const checkFirst = Loadout.findById(id)
@@ -39,6 +39,9 @@ class Loadout {
   }
 
   addLoadoutItem = (loadoutItem) => {
+    if (this.loadoutItems.length === 0) {
+      this.removeNoLoadoutItemRow()
+    }
     const checkFirst = this.findLoadoutItemById(loadoutItem.id)
     if (!checkFirst) {
       this.loadoutItems.push(new LoadoutItem(Object.assign(loadoutItem, {loadout: this})))
@@ -49,7 +52,10 @@ class Loadout {
   }
 
   removeLoadoutItem = (loadoutItem) => {
-    return this.loadoutItems.splice(this.loadoutItems.indexOf(testLoadoutItem => testLoadoutItem.id === loadoutItem.id), 1)
+    this.loadoutItems.splice(this.findIndexLoadoutItemById(loadoutItem.id), 1)
+    if (this.loadoutItems.length === 0) {
+      this.appendNoLoadoutItemRow()
+    }
   }
 
   destroy = () => {
@@ -64,12 +70,11 @@ class Loadout {
     this.userGame.removeLoadout(this)
   }
 
-  findLoadoutItemById = (id) => this.loadoutItems.find(item => item.id === id)
+  findLoadoutItemById = (id) => this.loadoutItems.find(item => item.id === parseInt(id))
+  findIndexLoadoutItemById = (id) => this.loadoutItems.findIndex(loadoutItem => loadoutItem.id === parseInt(id))
 
-  findItemById = (id) => {
-    console.log(id, this)
-    return this.items.find(item => item.id === id)
-  }
+  findItemById = (id) => this.items.find(item => item.id === id)
+  findIndexItemById = (id) => this.items.findIndex(item => item.id === id)
 
   static emptyLoadoutsRow = () => {
     return "<tr><td colspan='2'>No loadouts created yet</td></tr>"
@@ -130,15 +135,39 @@ class Loadout {
     this.loadoutShowDiv.append(this.showPageHeaderDiv, this.loadoutItemTableContainer)
   }
 
-  renderShowDiv = () => {
-    const loadoutShowDiv = document.createElement('div')
-    loadoutShowDiv.id = `loadout-show-div-${this.id}`
-    loadoutShowDiv.classList.add('mt-3')
-    loadoutShowDiv.addEventListener('click', LoadoutItemAdapter.loadoutItemTableSwitcher)
-    return loadoutShowDiv
+  // show page information for a loadout.  loads under the usergame card container
+  // all elements have a render method called by getter method
+  //
+  //  showDiv
+  //    |showPageHeaders
+  //    ------------
+  //    |loadoutItemContainer
+  //      |tableHeaders
+  //      -------------------
+  //      |tableBody
+  //
+
+
+  get showDiv() {
+    return this._showDiv = this._showDiv || this.renderShowDiv()
   }
 
-  renderShowPageHeaderDiv = () => {
+  renderShowDiv = () => {
+    const showDiv = document.createElement('div')
+    showDiv.id = `loadout-show-div-${this.id}`
+    showDiv.classList.add('mt-3')
+    showDiv.addEventListener('click', LoadoutItemAdapter.loadoutItemTableSwitcher)
+
+    showDiv.append(this.showPageHeaders, this.loadoutItemContainer)
+
+    return showDiv
+  }
+
+  get showPageHeaders() {
+    return this._showPageHeaders = this._showPageHeaders || this.renderShowPageHeaders()
+  }
+
+  renderShowPageHeaders = () => {
     const showPageHeaderDiv = document.createElement('div')
     showPageHeaderDiv.id = `loadout-header-${this.id}`
     showPageHeaderDiv.classList.add('text-center')
@@ -164,14 +193,27 @@ class Loadout {
     return showPageHeaderDiv
   }
 
-  renderLoadoutItemTableContainer = () => {
+  get loadoutItemContainer() {
+    return this._loadoutItemContainer = this._loadoutItemContainer || this.renderLoadoutItemContainer()
+  }
+
+  renderLoadoutItemContainer = () => {
     const loadoutItemTableContainer = document.createElement('div')
     loadoutItemTableContainer.id = `loadout-item-table-container-${this.id}`
     loadoutItemTableContainer.classList.add('table-responsive', 'mb-3', 'text-center')
 
-    const loadoutItemTableHeaders = document.createElement('table')
-    loadoutItemTableHeaders.classList.add('table', 'mb-0')
-    loadoutItemTableHeaders.innerHTML = `
+    loadoutItemTableContainer.append(this.tableHeaders, this.tableBody)
+    return loadoutItemTableContainer
+  }
+
+  get tableHeaders() {
+    return this._tableHeaders = this._tableHeaders || this.renderTableHeaders()
+  }
+
+  renderTableHeaders = () => {
+    const tableHeaders = document.createElement('table')
+    tableHeaders.classList.add('table', 'mb-0')
+    tableHeaders.innerHTML = `
       <thead>
         <tr>
           <th class="col-3">Name</th>
@@ -181,34 +223,47 @@ class Loadout {
         </tr>
       </thead>
     `
-
-    this.loadoutItemTableHolder = document.createElement('div')
-    this.loadoutItemTableHolder.id = `loadout-item-table-holder-${this.id}`
-
-    loadoutItemTableContainer.append(loadoutItemTableHeaders, this.loadoutItemTableHolder)
-    return loadoutItemTableContainer
+    return tableHeaders
   }
 
-  renderNoLoadoutItemHolder = () => {
-    const noLoadoutItemHolder = document.createElement('div')
-    noLoadoutItemHolder.innerHTML = `<table class="table text-center mb-0"<tbody><tr><td>No Loadout Items Created Yet</td></tr></tbody></table>`
-    return noLoadoutItemHolder
+  get tableBody() {
+    return this._tableBody = this._tableBody || this.renderTableBody()
   }
 
-  renderLoadoutItemTable = () => {
+  reRenderTableBody = () => {
+    const oldTableBody = this._tableBody
+    this._tableBody = this.renderTableBody()
+    oldTableBody.replaceWith(this._tableBody)
+  }
+
+  renderTableBody = () => {
+    const tableBody = document.createElement('div')
+    tableBody.id = `loadout-item-table-body-${this.id}`
+
     if (this.loadoutItems.length > 0) {
-      this.loadoutItemTableHolder.append(...this.loadoutItems.map(loadoutItem => loadoutItem.tableDiv))
+      tableBody.append(...this.loadoutItems.map(loadoutItem => loadoutItem.tableRow))
     } else {
-      this.appendNoLoadoutItemHolder()
+      tableBody.append(this.noLoadoutItemHolder)
     }
+    return tableBody
   }
 
-  appendNoLoadoutItemHolder = () => {
-    this.loadoutItemTableContainer.append(this.noLoadoutItemHolder)
+  get noLoadoutItemRow() {
+    return this._noLoadoutItemRow = this._noLoadoutItemRow || this.renderNoLoadoutItemRow()
   }
 
-  removeNoLoadoutItemHolder = () => {
-    this.noLoadoutItemHolder.remove()
+  renderNoLoadoutItemRow = () => {
+    const noLoadoutItemRow = document.createElement('div')
+    noLoadoutItemRow.innerHTML = `<table class="table text-center mb-0"<tbody><tr><td>No Loadout Items Created Yet</td></tr></tbody></table>`
+    return noLoadoutItemRow
+  }
+
+  appendNoLoadoutItemRow = () => {
+    this.tableBody.append(this.noLoadoutItemRow)
+  }
+
+  removeNoLoadoutItemRow = () => {
+    this.noLoadoutItemRow.remove()
   }
 
   resetMessages = () => {
