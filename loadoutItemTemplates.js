@@ -18,7 +18,7 @@ class LoadoutItemTemplates {
           </td>
           <td class="col-3">
             <button type="submit" class="btn btn-sm btn-primary me-3">Add to Loadout</button>
-            <button id="remove-form-${loadout.id}-${loadout.formCounter}" data-counter="${loadout.id}-${loadout.formCounter}" type="button" class="btn btn-sm btn-primary remove-form-button">Remove</button>
+            <button id="remove-form-${loadout.id}-${loadout.formCounter}" data-counter="${loadout.id}-${loadout.formCounter}" type="button" class="btn btn-sm btn-primary" data-target-class="loadout-item" data-button-type="remove-form">Remove</button>
           </td>
         </tr>
       </table>
@@ -47,7 +47,7 @@ class LoadoutItemTemplates {
           </td>
           <td class="col-3">
             <button type="submit" class="btn btn-sm btn-primary me-3">Edit Loadout Item</button>
-            <button id="remove-edit-form-${loadoutItem.id}" data-loadout-item-id="${loadoutItem.id}" type="button" class="btn btn-sm btn-primary cancel-edit-button">Cancel</button>
+            <button id="remove-edit-form-${loadoutItem.id}" data-loadout-item-id="${loadoutItem.id}" type="button" class="btn btn-sm btn-primary" data-target-class="loadout-item" data-button-type="cancel-edit">Cancel</button>
           </td>
         </tr>
       </table>
@@ -72,10 +72,29 @@ class LoadoutItemTemplates {
           </td>
           <td class="col-3">
             <button type="submit" class="btn btn-sm btn-primary me-3">Add to Loadout</button>
-            <button id="remove-form-${loadout.id}-${loadout.formCounter}" data-counter="${loadout.id}-${loadout.formCounter}" type="button" class="btn btn-sm btn-primary remove-form-button">Remove</button>
+            <button id="remove-form-${loadout.id}-${loadout.formCounter}" data-counter="${loadout.id}-${loadout.formCounter}" type="button" class="btn btn-sm btn-primary" data-target-class="loadout-item" data-button-type="remove-form">Remove</button>
           </td>
         </tr>
       </table>
+    `
+  }
+
+  static detailRowHtml = (loadoutItem) => {
+    return `
+      <tr>
+        <td class="col-3">${loadoutItem.name}</td>
+        <td class="col-2">${loadoutItem.quantity}</td>
+        <td class="col-4">${loadoutItem.note}</td>
+        <td class="col-3">${loadoutItem.optionButtons()}</td>
+      </tr>
+    `
+  }
+
+  static tableOptionButtons = (loadoutItem) => {
+    return `
+      <button type="button" data-bs-toggle="collapse" data-bs-target="#item-ingredients-div-${loadoutItem.item.id}" data-loadout-item-id="${loadoutItem.id}" class="btn btn-sm btn-primary me-3" data-target-class="item" data-button-type="ingredient-toggle">Ingredients</button>
+      <button type="button" data-loadout-item-id="${loadoutItem.id}" class="btn btn-sm btn-primary me-3" data-target-class="loadout-item" data-button-type="edit">Edit</button>
+      <button type="button" data-loadout-item-id="${loadoutItem.id}" class="btn btn-sm btn-primary me-3" data-target-class="loadout-item" data-button-type="delete">Delete</button>
     `
   }
 

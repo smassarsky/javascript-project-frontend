@@ -44,19 +44,15 @@ class ItemAdapter {
     document.querySelector(`#new-item-form-${e.target.dataset.counter}`).remove()
   }
 
-  static itemTableSwitcher = (e) => {
-    e.preventDefault()
-    switch (true) {
-      case (e.target.classList.contains("ingredients-button")):
-        console.log("toggle ingredients")
+  static switcher = (e) => {
+    switch (e.target.dataset.buttonType) {
+      case ('new-ingredient'):
+        Item.findById(e.target.dataset.itemId).newIngredientForm()
+        console.log("TODO new ingredient")
         break
-      case (e.target.classList.contains("edit-button")):
-        this.editRow(e.target.dataset.itemId)
+      case ('existing-ingredient'):
+        Item.findById(e.target.dataset.itemId).existingIngredientForm()
         break
-      case (e.target.classList.contains("delete-button")):
-        this.deleteItem(e.target.dataset.itemId)
-        break
-
     }
   }
 

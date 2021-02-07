@@ -128,11 +128,7 @@ class Item {
   renderIngredientsHeaderAndOptions = () => {
     const header = document.createElement('div')
     header.id = `ingredient-table-headers-div-${this.id}`
-    header.innerHTML = `
-      <h4>Ingredients</h4>
-      <button type="button" id="add-new-ingredient-${this.id}" data-item-id="${this.id} "class="btn btn-sm btn-primary me-3 new-ingredient-button">Add New Ingredient</button>
-      <button type="button" id="add-existing-ingredient-${this.id}" data-item-id="${this.id}" class="btn btn-sm btn-primary existing-ingredient-button">Add Existing Ingredient</button>
-    `
+    header.innerHTML = ItemTemplates.tableHeaderAndOptions(this)
     return header
   }
 
@@ -157,16 +153,7 @@ class Item {
   renderIngredientsTableHead = () => {
     const thead = document.createElement('table')
     thead.classList.add('table', 'mb-0')
-    thead.innerHTML = `
-      <thead>
-        <tr>
-          <td class="col-3">Name</td>
-          <td class="col-2">Quantity</td>
-          <td class="col-4">Note</td>
-          <td class="col-3">Actions</td>
-        </tr>
-      </thead>
-    `
+    thead.innerHTML = ItemTemplates.ingredientTHead()
     return thead
   }
 
@@ -192,9 +179,7 @@ class Item {
   renderNoIngredientsRow = () => {
     const noIngredientsRow = document.createElement('table')
     noIngredientsRow.classList.add('table', 'mb-0')
-    noIngredientsRow.innerHTML = `
-      <tbody><tr><td colspan="4">No Ingredients Added Yet</td></tr></tbody>
-    `
+    noIngredientsRow.innerHTML = ItemTemplates.noIngredientsHtml()
     return noIngredientsRow
   }
 

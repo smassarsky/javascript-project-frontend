@@ -61,4 +61,15 @@ class IngredientAdapter {
     })
   }
 
+  static switcher = (e) => {
+    switch (e.target.dataset.buttonType) {
+      case ('edit'):
+        console.log('TODO Edit ingredient')
+        break
+      case ('delete'):
+        console.log('TODO delete ingredient')
+        break
+    }
+  }
+
 }

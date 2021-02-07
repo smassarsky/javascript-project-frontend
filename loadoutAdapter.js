@@ -81,6 +81,20 @@ class LoadoutAdapter {
     }
   }
 
+  static switcher(e) {
+    switch (e.target.dataset.buttonType) {
+      case ('new'):
+        LoadoutItem.newForm(e.target.dataset.loadoutId)
+        break
+      case ('existing'):
+        LoadoutItem.existingForm(e.target.dataset.loadoutId)
+        break
+      case ('remove-form'):
+        LoadoutItemAdapter.removeLoadoutItemForm(e)
+        break
+    }
+  }
+
   static editNameRow(id) {
     const loadout = Loadout.findById(id)
     const div = document.querySelector(`#user-game-loadout-div-${id}`)

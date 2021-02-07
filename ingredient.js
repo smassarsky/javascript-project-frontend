@@ -42,18 +42,7 @@ class Ingredient {
     const tableRow = document.createElement('table')
     tableRow.id = `ingredient-row-${this.id}`
     tableRow.classList.add('table', 'mb-0')
-
-    tableRow.innerHTML = `
-      <tr>
-        <td class="col-3">${this.name}</td>
-        <td class="col-2">${this.quantity}</td>
-        <td class="col-4">${this.note}</td>
-        <td class="col-3">
-          <button type="button" data-ingredient-id="${this.id}" class="btn btn-sm btn-primary me-3 edit-button">Edit</button>
-          <button type="button" data-ingredient-id="${this.id}" class="btn btn-sm btn-primary delete-button">Delete</button>
-        </td>
-      </tr>
-    `
+    tableRow.innerHTML = IngredientTemplates.tableData(this)
     return tableRow
   }
 

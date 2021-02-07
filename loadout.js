@@ -71,10 +71,6 @@ class Loadout {
   findItemById = (id) => this.items.find(item => item.id === id)
   findIndexItemById = (id) => this.items.findIndex(item => item.id === id)
 
-  static emptyLoadoutsRow = () => {
-    return "<tr><td colspan='2'>No loadouts created yet</td></tr>"
-  }
-
   get userGameTableDiv() {
     return this._userGameTableDiv = this._userGameTableDiv || this.renderUserGameTableDiv()
   }
@@ -90,34 +86,12 @@ class Loadout {
   editLoadoutNameForm = () => {
     const newEditLoadoutNameForm = document.createElement('form')
     newEditLoadoutNameForm.dataset.loadoutId = this.id
-    newEditLoadoutNameForm.innerHTML = 
-    `
-      <table class="table mb-0 text-center">
-        <tr>
-          <td class="col-6">
-            <label for="edit-loadout-name-${this.id}" class="visually-hidden">Edit Loadout Name</label>
-            <input id="edit-loadout-name-${this.id}" class="form-control" type="text" name="name" value="${this.name}" placeholder="Name">
-          </td>
-          <td class="col-6">
-            <button type="submit" class="btn btn-sm btn-primary me-3">Edit Name</button>
-            <button type="button" class="btn btn-sm btn-primary cancel-edit-button" data-loadout-id="${this.id}">Cancel</button>
-          </td>
-        </tr>
-      </table>
-    `
+    newEditLoadoutNameForm.innerHTML = LoadoutTemplates.editNameForm(this)
+
     newEditLoadoutNameForm.addEventListener('submit', LoadoutAdapter.editLoadoutName)
     this.editLoadoutForm = newEditLoadoutNameForm
     return newEditLoadoutNameForm
   }
-
-  // renderShowPage = () => {
-  //   this.loadoutShowDiv = this.renderShowDiv()
-  //   this.showPageHeaderDiv = this.renderShowPageHeaderDiv()
-  //   this.loadoutItemTableContainer = this.renderLoadoutItemTableContainer()
-  //   this.noLoadoutItemHolder = this.renderNoLoadoutItemHolder()
-
-  //   this.loadoutShowDiv.append(this.showPageHeaderDiv, this.loadoutItemTableContainer)
-  // }
 
   // show page information for a loadout.  loads under the usergame card container
   // all elements have a render method called by getter method
@@ -161,10 +135,7 @@ class Loadout {
 
     const buttonDiv = document.createElement('div')
     buttonDiv.classList.add('mb-3')
-    buttonDiv.innerHTML = `
-      <button data-loadout-id="${this.id}" class="btn btn-sm btn-primary me-3 new-loadout-item-button">New Loadout Item</button>
-      <button data-loadout-id="${this.id}" class="btn btn-sm btn-primary existing-loadout-item-button">Add Existing Loadout Item</button>
-    `
+    buttonDiv.innerHTML = LoadoutTemplates.showPageButtonHtml(this)
 
     this.successDiv = document.createElement('div')
     this.successDiv.classList.add('text-success')
@@ -197,16 +168,7 @@ class Loadout {
   renderTableHeaders = () => {
     const tableHeaders = document.createElement('table')
     tableHeaders.classList.add('table', 'mb-0')
-    tableHeaders.innerHTML = `
-      <thead>
-        <tr>
-          <th class="col-3">Name</th>
-          <th class="col-2">Quantity</th>
-          <th class="col-4">Note</th>
-          <th class="col-3">Actions</th>
-        </tr>
-      </thead>
-    `
+    tableHeaders.innerHTML = LoadoutTemplates.loadoutItemThead()
     return tableHeaders
   }
 
@@ -238,7 +200,7 @@ class Loadout {
 
   renderNoLoadoutItemRow = () => {
     const noLoadoutItemRow = document.createElement('div')
-    noLoadoutItemRow.innerHTML = `<table class="table text-center mb-0"<tbody><tr><td>No Loadout Items Created Yet</td></tr></tbody></table>`
+    noLoadoutItemRow.innerHTML = LoadoutTemplates.noLoadoutItemHtml()
     return noLoadoutItemRow
   }
 

@@ -22,7 +22,7 @@ class IngredientTemplates {
           </td>
           <td class="col-3">
             <button type="submit" class="btn btn-sm btn-primary me-3">Create</button>
-            <button data-counter="${item.id}-${item.formCounter}" type="button" class="btn btn-sm btn-primary remove-form-button">Remove</button>
+            <button data-counter="${item.id}-${item.formCounter}" type="button" class="btn btn-sm btn-primary" data-target-class="ingredient" data-button-type="remove-form">Remove</button>
           </td>
         </tr>
       </table>
@@ -47,7 +47,7 @@ class IngredientTemplates {
           </td>
           <td class="col-3">
             <button type="submit" class="btn btn-sm btn-primary me-3">Create</button>
-            <button data-counter="${item.id}-${item.formCounter}" type="button" class="btn btn-sm btn-primary remove-form-button">Remove</button>
+            <button data-counter="${item.id}-${item.formCounter}" type="button" class="btn btn-sm btn-primary" data-target-class="ingredient" data-button-type="remove-form">Remove</button>
           </td>
         </tr>
       </table>
@@ -61,9 +61,8 @@ class IngredientTemplates {
         <td class="col-2">${ingredient.quantity}</td>
         <td class="col-4">${ingredient.note}</td>
         <td class="col-3">
-          <button type="button" data-ingredient-id="${ingredient.id}" class="btn btn-sm btn-primary me-3 edit-button">Edit</button>
-          
-          <button type="button" data-ingredient-id="${ingredient.id}" class="btn btn-sm btn-primary delete-button">Delete</button>
+          <button type="button" data-ingredient-id="${ingredient.id}" class="btn btn-sm btn-primary me-3" data-target-class="ingredient" data-button-type="edit">Edit</button>
+          <button type="button" data-ingredient-id="${ingredient.id}" class="btn btn-sm btn-primary" data-target-class="ingredient" data-button-type="delete">Delete</button>
         </td>
       </tr>
     `

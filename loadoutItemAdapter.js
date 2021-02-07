@@ -103,36 +103,39 @@ class LoadoutItemAdapter {
   }
 
   static loadoutItemTableSwitcher = (e) => {
-    switch (true) {
-      case (e.target.classList.contains("new-loadout-item-button")):
-        LoadoutItem.newForm(e.target.dataset.loadoutId)
+    switch (e.target.dataset.targetClass) {
+      case ('loadout'):
+        LoadoutAdapter.switcher(e)
         break
-      case (e.target.classList.contains("existing-loadout-item-button")):
-        LoadoutItem.existingForm(e.target.dataset.loadoutId)
-        console.log("make existing loadout item")
+      case ('loadout-item'):
+        this.switcher(e)
         break
-      case (e.target.classList.contains("remove-form-button")):
+      case ('item'):
+        ItemAdapter.switcher(e)
+        break
+      case ('ingredient'):
+        IngredientAdapter.switcher(e)
+        break
+    }
+  }
+
+  static switcher = (e) => {
+    switch (e.target.dataset.buttonType) {
+      case ('remove-form'):
         this.removeLoadoutItemForm(e)
-        console.log("remove new form button")
         break
-      case (e.target.classList.contains("edit-button")):
+
+      case ('edit'):
         this.editRow(e.target.dataset.loadoutItemId)
         break
-      case (e.target.classList.contains("cancel-edit-button")):
+      case ('cancel-edit'):
         this.removeEditRow(e.target.dataset.loadoutItemId)
         break
-      case (e.target.classList.contains("delete-button")):
+      case ('delete'):
         this.deleteLoadoutItem(e.target.dataset.loadoutItemId)
         break
-      case (e.target.classList.contains("new-ingredient-button")):
-        Item.findById(e.target.dataset.itemId).newIngredientForm()
-        console.log("TODO new ingredient")
-        break
-      case (e.target.classList.contains("existing-ingredient-button")):
-        const item = Item.findById(e.target.dataset.itemId)
-        item.existingIngredientForm()
-        console.log("TODO existing ingredient")
-        break
+
+
     }
   }
 

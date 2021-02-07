@@ -72,4 +72,31 @@ class ItemTemplates {
     return newEditItemForm
   }
 
+  static tableHeaderAndOptions = (item) => {
+    return `
+    <h4>Ingredients</h4>
+    <button type="button" id="add-new-ingredient-${item.id}" data-item-id="${item.id} "class="btn btn-sm btn-primary me-3" data-target-class="item" data-button-type="new-ingredient">Add New Ingredient</button>
+    <button type="button" id="add-existing-ingredient-${item.id}" data-item-id="${item.id}" class="btn btn-sm btn-primary" data-target-class="item" data-button-type="existing-ingredient">Add Existing Ingredient</button>
+  `
+  }
+
+  static ingredientTHead = () => {
+    return `
+      <thead>
+        <tr>
+          <td class="col-3">Name</td>
+          <td class="col-2">Quantity</td>
+          <td class="col-4">Note</td>
+          <td class="col-3">Actions</td>
+        </tr>
+      </thead>
+    `
+  }
+
+  static noIngredientsHtml = () => {
+    return `
+      <tbody><tr><td colspan="4">No Ingredients Added Yet</td></tr></tbody>
+    `
+  }
+
 }
