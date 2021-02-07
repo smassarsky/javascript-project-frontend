@@ -22,10 +22,8 @@ class LoadoutItem {
   }
 
   update({quantity, item}) {
-    const rerender = false
     if (quantity && quantity !== this.quantity){
       this.quantity = quantity
-      rerender = true
     }
     this.item = new Item(item)
     return this
@@ -145,6 +143,42 @@ class LoadoutItem {
     this.editForm = LoadoutItemTemplates.editForm(this)
     return this.editForm
   }
+
+  static newForm = (loadoutId) => {
+    const loadout = Loadout.findById(loadoutId)
+    const newLoadoutItemForm = document.createElement('form')
+    newLoadoutItemForm.id = `loadout-item-form-${loadout.id}-${loadout.formCounter}`
+    newLoadoutItemForm.dataset.loadoutId = loadout.id
+    newLoadoutItemForm.dataset.counter = loadout.formCounter
+    newLoadoutItemForm.innerHTML = LoadoutItemTemplates.newFormHtml(loadout)
+    newLoadoutItemForm.addEventListener('submit', LoadoutItemAdapter.addLoadoutItemNew)
+    loadout.tableBody.prepend(newLoadoutItemForm)
+    loadout.formCounter++
+  }
+
+  static existingForm = (loadoutId) => {
+    const loadout = Loadout.findById(loadoutId)
+    const existingForm = document.createElement('form')
+    existingForm.id = `loadout-item-form-${loadout.id}-${loadout.formCounter}`
+    existingForm.dataset.counter = loadout.formCounter
+    existingForm.dataset.loadoutId = loadout.id
+    existingForm.innerHTML = LoadoutItemTemplates.existingFormHtml(loadout)
+    existingForm.addEventListener('submit', LoadoutItemAdapter.addLoadoutItemExisting)
+    loadout.tableBody.prepend(existingForm)
+
+    const dropDown = document.querySelector(`#existing-item-name-${loadout.id}-${loadout.formCounter}`)
+
+    ItemAdapter.fetchUserGameItemsTruncated(loadout.userGame)
+    .then(() => {
+      loadout.userGame.items.forEach(item => dropDown.appendChild(item.optionElement()))
+      dropDown.addEventListener('change', (e) => {
+        const item = Item.findById(parseInt(e.target.value))
+        document.querySelector(`#existing-item-note-${e.target.dataset.counter}`).innerHTML = item.note
+      })
+    })
+    this.formCounter++
+  }
+
 
   // renderEditForm = () => {
   //   const editForm = document.createElement('form')

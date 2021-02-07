@@ -16,7 +16,6 @@ class UserGame {
       this.items = []
       this.formCounter = 0
 
-      this.gameCard = this.renderCard()
 
       UserGame.all.push(this)
       return this
@@ -42,12 +41,14 @@ class UserGame {
     if (loadouts.length > 0) {
       loadouts.forEach(loadout => this.addLoadout(loadout))
     }
-    this.renderShowPage()
   }
 
   // add / remove methods for related objects
   addLoadout = (loadoutJson) => {
     const checkFirst = this.findLoadoutById(loadoutJson.id)
+    if (this.loadouts.length === 0) {
+      this.noLoadoutsHolder.remove()
+    }
     if (!checkFirst) {
       this.loadouts.push(new Loadout(Object.assign(loadoutJson, {userGame: this})))
       return this.loadouts[this.loadouts.length - 1]
@@ -59,6 +60,9 @@ class UserGame {
 
   removeLoadout = (loadout) => {
     this.loadouts.splice(this.findLoadoutIndexById(loadout.id), 1)
+    if (this.loadouts.length === 0) {
+      this.loadoutsTableBody.append(this.noLoadoutsHolder)
+    }
   }
 
   addItem = (itemJson) => {
@@ -76,37 +80,53 @@ class UserGame {
     this.items.splice(this.findItemIndexById(item.id), 1)
   }
 
-  renderShowPage = () => {
-    this.userGameShowContainer = document.createElement('div')
-
-    this.cardContainer = this.renderCardContainer()
-    this.infoContainer = this.renderInfoContainer()
-
-    this.tasksDiv = this.renderTasksDiv()
-    this.loadoutsDiv = this.renderLoadoutsDiv()
-
-    this.loadoutsHeaderDiv = this.renderLoadoutsHeaderDiv()
-    this.loadoutsTableContainer = this.renderLoadoutsTableContainer()
-
-    this.userGameShowContainer.append(this.cardContainer, this.infoContainer)
-    this.infoContainer.append(this.tasksDiv, this.loadoutsDiv)
-    this.loadoutsDiv.append(this.loadoutsHeaderDiv, this.loadoutsTableContainer)
-    this.renderLoadoutTableData()
+  loadShowPage = () => {
+    SessionAdapter.clearHeaderDiv()
+    SessionAdapter.clearCardContainer()
+    SessionAdapter.cardContainer.append(this.gameCard)
+    SessionAdapter.clearInfoContainer()
+    SessionAdapter.infoContainer.classList.add('row')
+    SessionAdapter.infoContainer.append(this.tasksDiv, this.loadoutsDiv)
   }
 
-  renderCardContainer = () => {
-    const cardContainer = document.createElement('div')
-    cardContainer.id = `card-container-${this.id}`
-    cardContainer.classList.add('row', 'row-cols-2', 'row-cols-md-4', 'row-cols-lg-6', 'g-4', 'justify-content-center', 'my-3')
-    cardContainer.append(this.gameCard)
-    return cardContainer
-  }
+  // get showPage() {
+  //   return this._showPage = this._showPage || this.renderShowPage()
+  // }
 
-  renderInfoContainer = () => {
-    const infoContainer = document.createElement('div')
-    infoContainer.id = `user-game-info-container-${this.id}`
-    infoContainer.classList.add('row')
-    return infoContainer
+
+  // renderShowPage = () => {
+  //   const showPage = document.createElement('div')
+  //   showPage.id = `user-game-show-page-${this.id}`
+  //   showPage.append(this.cardContainer, this.infoContainer)
+  //   return showPage
+  // }
+
+  // get cardContainer() {
+  //   return this._cardContainer = this._cardContainer || this.renderCardContainer()
+  // }
+
+  // renderCardContainer = () => {
+  //   const cardContainer = document.createElement('div')
+  //   cardContainer.id = `card-container-${this.id}`
+  //   cardContainer.classList.add('row', 'row-cols-2', 'row-cols-md-4', 'row-cols-lg-6', 'g-4', 'justify-content-center', 'my-3')
+  //   cardContainer.append(this.gameCard)
+  //   return cardContainer
+  // }
+
+  // get infoContainer() {
+  //   return this._infoContainer = this._infoContainer || this.renderInfoContainer()
+  // }
+
+  // renderInfoContainer = () => {
+  //   const infoContainer = document.createElement('div')
+  //   infoContainer.id = `user-game-info-container-${this.id}`
+  //   infoContainer.classList.add('row')
+  //   infoContainer.append(this.tasksDiv, this.loadoutsDiv)
+  //   return infoContainer
+  // }
+
+  get tasksDiv() {
+    return this._tasksDiv = this._tasksDiv || this.renderTasksDiv()
   }
 
   renderTasksDiv = () => {
@@ -116,78 +136,120 @@ class UserGame {
     return tasksDiv
   }
 
+  get loadoutsDiv() {
+    return this._loadoutsDiv = this._loadoutsDiv || this.renderLoadoutsDiv()
+  }
+
   renderLoadoutsDiv = () => {
     const loadoutsDiv = document.createElement('div')
     loadoutsDiv.id = `loadouts-div-${this.id}`
     loadoutsDiv.classList.add('col', 'justify-content-center')
     loadoutsDiv.addEventListener('click', LoadoutAdapter.loadoutTableSwitcher)
+    loadoutsDiv.append(this.loadoutsHeaderDiv, this.loadoutsTableContainer)
     return loadoutsDiv
+  }
+
+  get loadoutsHeaderDiv() {
+    return this._loadoutsHeadersDiv = this._loadoutsHeadersDiv || this.renderLoadoutsHeaderDiv()
   }
 
   renderLoadoutsHeaderDiv = () => {
     const loadoutsHeaderDiv = document.createElement('div')
     loadoutsHeaderDiv.classList.add('text-center')
-
-    const h3 = document.createElement('h3')
-    h3.innerText = "Loadouts"
-
-    const newLoadoutButton = document.createElement('button')
-    newLoadoutButton.innerText = "New Loadout"
-    newLoadoutButton.classList.add('btn', 'btn-primary', 'new-loadout-button')
-    newLoadoutButton.dataset.userGameId = this.id
-
-    const successDiv = document.createElement('div')
-    successDiv.classList.add('text-success')
-    this.successDiv = successDiv
-
-    const failureDiv = document.createElement('div')
-    failureDiv.classList.add('text-danger')
-    this.failureDiv = failureDiv
-
-    loadoutsHeaderDiv.append(h3, newLoadoutButton, successDiv, failureDiv)
-
-    this.noLoadoutsHolder = this.renderNoLoadoutHolder()
-
+    loadoutsHeaderDiv.append(this.loadoutsHeaderAndOptions, this.loadoutsSuccessDiv, this.loadoutsFailureDiv)
     return loadoutsHeaderDiv
+  }
+
+  get loadoutsHeaderAndOptions() {
+    return this._loadoutsHeaderAndOptions = this._loadoutsHeaderAndOptions || this.renderLoadoutsHeaderAndOptions()
+  }
+
+  renderLoadoutsHeaderAndOptions = () => {
+    const newDiv = document.createElement('div')
+    newDiv.innerHTML = UserGameTemplates.loadoutsHeaderAndOptionsHtml(this)
+    return newDiv
+  }
+
+  get loadoutsSuccessDiv() {
+    return this._loadoutsSuccessDiv = this._loadoutsSuccessDiv || this.renderSuccessDiv()
+  }
+
+  get tasksSuccessDiv() {
+    return this._tasksSuccessDiv = this._tasksSuccessDiv || this.renderSuccessDiv()
+  }
+
+  renderSuccessDiv = () => {
+    const successDiv = document.createElement('div')
+    successDiv.classList.add('text-success', 'success-div')
+    return successDiv
+  }
+
+  get loadoutsFailureDiv() {
+    return this._loadoutsFailureDiv = this._loadoutsFailureDiv || this.renderFailureDiv()
+  }
+
+  get tasksFailureDiv() {
+    return this._tasksFailureDiv = this._tasksFailureDiv || this.renderFailureDiv()
+  }
+
+  renderFailureDiv = () => {
+    const failureDiv = document.createElement('div')
+    failureDiv.classList.add('text-danger', 'failure-div')
+    return failureDiv
+  }
+
+  get loadoutsTableContainer() {
+    return this._loadoutsTableContainer = this._loadoutsTableContainer || this.renderLoadoutsTableContainer()
   }
 
   renderLoadoutsTableContainer = () => {
     const loadoutsTableContainer = document.createElement('div')
     loadoutsTableContainer.classList.add('table-responsive', 'mb-3')
-
-    const loadoutTh = document.createElement('table')
-    loadoutTh.classList.add('table', 'text-center', 'mb-0')
-    loadoutTh.innerHTML = `
-      <thead>
-        <tr>
-          <th class="col-6">Name</th>
-          <th class="col-6">Actions</th>
-        </tr>
-      </thead>
-    `
-
-    const loadoutTableBody = document.createElement('div')
-    this.loadoutTableBody = loadoutTableBody
-
-    loadoutsTableContainer.append(loadoutTh, loadoutTableBody)
+    loadoutsTableContainer.append(this.loadoutsTableHead, this.loadoutsTableBody)
     return loadoutsTableContainer
   }
 
-  renderLoadoutTableData = () => {
-    this.loadoutTableBody.innerHTML = ""
+  get loadoutsTableHead() {
+    return this._loadoutsTableHead = this._loadoutsTableHead || this.renderLoadoutsTableHead()
+  }
+
+  renderLoadoutsTableHead = () => {
+    const thead = document.createElement('div')
+    thead.innerHTML = UserGameTemplates.loadoutsTheadHtml(this)
+    return thead
+  }
+
+  get loadoutsTableBody() {
+    return this._loadoutsTableBody = this._loadoutsTableBody || this.renderLoadoutsTableBody()
+  }
+
+  renderLoadoutsTableBody = () => {
+    const loadoutsTableBody = document.createElement('div')
     if (this.loadouts.length > 0) {
-      this.loadouts.forEach(loadout => this.loadoutTableBody.append(loadout.renderUserGameTableDiv()))
+      this.loadouts.forEach(loadout => loadoutsTableBody.append(loadout.userGameTableDiv))
     } else {
-      this.appendNoLoadoutHolder()
+      loadoutsTableBody.append(this.noLoadoutsHolder)
     }
+    return loadoutsTableBody
   }
 
-  appendNoLoadoutHolder = () => {
-    this.loadoutsTableContainer.append(this.noLoadoutHolder)
+  appendNoLoadoutsHolder = () => {
+    this.loadoutsTableBody.append(this.noLoadoutsHolder)
   }
 
-  removeNoLoadoutHolder = () => {
-    this.noLoadoutHolder.remove()
+  removeNoLoadoutsHolder = () => {
+    this.noLoadoutsHolder.remove()
+  }
+
+  get noLoadoutsHolder() {
+    return this._noLoadoutsHolder = this._noLoadoutsHolder || this.renderNoLoadoutsHolder()
+  }
+
+  renderNoLoadoutsHolder = () => {
+    const noLoadoutsHolder = document.createElement('table')
+    noLoadoutsHolder.classList.add('table', 'text-center', 'mb-0')
+    noLoadoutsHolder.innerHTML = "<tbody><tr><td>No Loadouts Created Yet</td></tr></tbody>"
+    return noLoadoutsHolder
   }
 
   renderTasksTable() {
@@ -209,30 +271,24 @@ class UserGame {
     `
   }
 
+  get gameCard() {
+    return this._gameCard = this._gameCard || this.renderCard()
+  }
+
   renderCard() {
     const newCard = document.createElement('div')
     newCard.className = 'col'
-    newCard.innerHTML = `
-      <div class="card user-game-card" data-user-game-id="${this.id}">
-        <img src="${this.coverUrl}" class="card-img-top" alt="${this.name} Cover">
-        <div class="card-body">
-          <h5 class="card-title text-center">${this.name}</h5>
-        </div>
-      </div>
-    `
+    newCard.dataset.userGameId = this.id
+    newCard.innerHTML = UserGameTemplates.userGameCardHtml(this)
+    newCard.addEventListener('click', UserGameAdapter.loadShowUserGamePage)
     return newCard
   }
 
-  renderNoLoadoutHolder = () => {
-    const noLoadoutHolder = document.createElement('table')
-    noLoadoutHolder.classList.add('table', 'text-center', 'mb-0')
-    noLoadoutHolder.innerHTML = "<tbody><tr><td>No Loadouts Created Yet</td></tr></tbody>"
-    this.noLoadoutHolder = noLoadoutHolder
-  }
-
   resetMessages = () => {
-    this.successDiv.innerHTML = ""
-    this.failureDiv.innerHTML = ""
+    this.loadoutSuccessDiv.innerHTML = ""
+    this.loadoutFailureDiv.innerHTML = ""
+    //this.taskSuccessDiv.innerHTML = ""
+    //this.taskFailureDiv.innerHTML = ""
   }
 
 }

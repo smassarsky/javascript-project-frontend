@@ -62,11 +62,6 @@ class Loadout {
     Loadout.all.splice(Loadout.findIndexById(this.id), 1)
     this.loadoutItems.forEach(loadoutItem => loadoutItem.destroy())
     this.userGameTableDiv.remove()
-
-    if (this.userGame.loadouts.length === 1) {
-      this.userGame.appendNoLoadoutHolder()
-    }
-
     this.userGame.removeLoadout(this)
   }
 
@@ -80,28 +75,17 @@ class Loadout {
     return "<tr><td colspan='2'>No loadouts created yet</td></tr>"
   }
 
-  renderUserGameTableDiv(...options) {
-    if (options.length === 0) {
-      options = ["Show", "Edit Name", "Delete"]
-    }
-    const div = document.createElement('div')
-    div.id = `user-game-loadout-div-${this.id}`
-    div.innerHTML = `
-      <table class="table mb-0 text-center">
-        <tr>
-          <td class="col-6">${this.name}</td>
-          <td class="col-6">${this.optionButtons(options)}</td>
-        </tr>
-      </table>
-    `
-    this.userGameTableDiv = div
-    return div
+  get userGameTableDiv() {
+    return this._userGameTableDiv = this._userGameTableDiv || this.renderUserGameTableDiv()
   }
 
-  optionButtons(options) {
-    return options.map(option => `<button data-loadout-id="${this.id}" class="btn btn-sm btn-primary me-3 ${option.toLowerCase().split(" ").join("-")}-button">${option}</button>`).join('')
+  renderUserGameTableDiv() {
+    const options = ["Show", "Edit Name", "Delete"]
+    const div = document.createElement('div')
+    div.id = `user-game-loadout-div-${this.id}`
+    div.innerHTML = LoadoutTemplates.userGameTableDivHtml(this)
+    return div
   }
-  
 
   editLoadoutNameForm = () => {
     const newEditLoadoutNameForm = document.createElement('form')
@@ -126,14 +110,14 @@ class Loadout {
     return newEditLoadoutNameForm
   }
 
-  renderShowPage = () => {
-    this.loadoutShowDiv = this.renderShowDiv()
-    this.showPageHeaderDiv = this.renderShowPageHeaderDiv()
-    this.loadoutItemTableContainer = this.renderLoadoutItemTableContainer()
-    this.noLoadoutItemHolder = this.renderNoLoadoutItemHolder()
+  // renderShowPage = () => {
+  //   this.loadoutShowDiv = this.renderShowDiv()
+  //   this.showPageHeaderDiv = this.renderShowPageHeaderDiv()
+  //   this.loadoutItemTableContainer = this.renderLoadoutItemTableContainer()
+  //   this.noLoadoutItemHolder = this.renderNoLoadoutItemHolder()
 
-    this.loadoutShowDiv.append(this.showPageHeaderDiv, this.loadoutItemTableContainer)
-  }
+  //   this.loadoutShowDiv.append(this.showPageHeaderDiv, this.loadoutItemTableContainer)
+  // }
 
   // show page information for a loadout.  loads under the usergame card container
   // all elements have a render method called by getter method
@@ -243,7 +227,7 @@ class Loadout {
     if (this.loadoutItems.length > 0) {
       tableBody.append(...this.loadoutItems.map(loadoutItem => loadoutItem.tableRow))
     } else {
-      tableBody.append(this.noLoadoutItemHolder)
+      tableBody.append(this.noLoadoutItemRow)
     }
     return tableBody
   }

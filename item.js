@@ -29,26 +29,23 @@ class Item {
   }
 
   update({name, note, ingredients = [], loadoutItem}) {
-    let rerender = false
+
     if (name) {
       this.name = name
-      rerender = true
+
     }
     if (note != undefined) {
       this.note = note
-      rerender = true
+
     }
     if (ingredients.length > 0 && ingredients.map(ing => ing.id) != this.ingredients.map(ing => ing.id)) {
       this.ingredients = []
       ingredients.forEach(ingredient => this.addIngredient(ingredient))
-      rerender = true
+
     }
     if (loadoutItem) {
       this.addLoadoutItem(loadoutItem)
-      rerender = true
-    }
-    if (rerender) {
-      this.reRenderIngredientDiv()
+
     }
   }
 

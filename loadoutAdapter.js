@@ -12,27 +12,11 @@ class LoadoutAdapter {
 
   static newLoadoutFormRow = (id) => {
     const userGame = UserGame.findById(parseInt(id))
-
     const newLoadoutForm = document.createElement('form')
-
-    newLoadoutForm.id = `new-loadout-form-${userGame.formCounter}`
+    newLoadoutForm.id = `new-loadout-form-${userGame.id}-${userGame.formCounter}`
     newLoadoutForm.dataset.userGameId = `${userGame.id}`
-    newLoadoutForm.innerHTML = 
-    `
-      <table class="table mb-0 text-center">
-        <tr>
-          <td class="col-6">
-            <label for="new-loadout-name-${userGame.formCounter}" class="visually-hidden">New Loadout Name</label>
-            <input id="new-loadout-name-${userGame.formCounter}" class="form-control" type="text" name="name" placeholder="Name">
-          </td>
-          <td class="col-6">
-            <button type="submit" class="btn btn-sm btn-primary me-3">Create Loadout</button>
-            <button type="button" data-counter="${userGame.formCounter}" class="btn btn-sm btn-primary remove-button">Remove</button>
-          </td>
-        </tr>
-      </table>
-    `
-    userGame.loadoutTableBody.prepend(newLoadoutForm)
+    newLoadoutForm.innerHTML = LoadoutTemplates.newLoadoutFormHtml(userGame)
+    userGame.loadoutsTableBody.prepend(newLoadoutForm)
     newLoadoutForm.addEventListener('submit', this.createNewLoadout)
     userGame.formCounter++
   }
@@ -55,17 +39,16 @@ class LoadoutAdapter {
     .then(resp => resp.json())
     .then(json => {
       if (json.error) {
-        document.querySelector('#loadout-error-div').innerHTML = json.error
+        userGame.loadoutsFailureDiv.innerHTML = json.error
       } else {
         const newLoadout = userGame.addLoadout(json)
-        e.target.after(newLoadout.renderUserGameTableDiv())
+        e.target.after(newLoadout.userGameTableDiv)
         e.target.remove()
         if (userGame.loadoutsTableContainer.contains(userGame.noLoadoutHolder)) {
           userGame.noLoadoutHolder.remove()
         }
       }
     })
-    .catch(error => console.error(error))
   }
 
   static loadoutTableSwitcher = (e) => {
@@ -83,7 +66,7 @@ class LoadoutAdapter {
         e.preventDefault()
         this.loadoutShowPage(e.target.dataset.loadoutId)
         break
-      case e.target.classList.contains("edit-name-button"):
+      case e.target.classList.contains("edit-button"):
         e.preventDefault()
         this.editNameRow(e.target.dataset.loadoutId)
         break
@@ -133,7 +116,7 @@ class LoadoutAdapter {
   }
 
   static deleteLoadout = (id) => {
-    const loadout = Loadout.findById(parseInt(id))
+    const loadout = Loadout.findById(id)
     fetch(`${this.baseURL}/${loadout.id}`, {
       method: "DELETE", 
       credentials: 'include'
@@ -143,14 +126,15 @@ class LoadoutAdapter {
       if (!json.error) {
         loadout.destroy()
       } else {
-        document.querySelector('#loadout-error-div').innerHTML = json.error
+        loadout.userGame.loadoutsFailureDiv.innerHTML = json.error
       }
     })
   }
 
   static loadoutShowPage(id) {
     const loadout = Loadout.findById(id)
-    loadout.userGame.infoContainer.replaceWith(loadout.showDiv)
+    SessionAdapter.clearInfoContainer()
+    SessionAdapter.infoContainer.append(loadout.showDiv)
     this.fetchItemsAndIngredients(loadout)
   }
 

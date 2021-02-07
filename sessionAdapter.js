@@ -1,11 +1,38 @@
 class SessionAdapter {
   static baseURL = 'http://localhost:3000'
   static container = document.querySelector('#content-container')
+  static headerDiv = document.querySelector('#header-div')
+  static cardContainer = document.querySelector('#card-container')
+  static infoContainer = document.querySelector('#info-container')
   static nav = document.querySelector('#navbar')
+
+  static clearAll = () => {
+    this.clearHeaderDiv()
+    this.clearCardContainer()
+    this.clearInfoContainer()
+  }
+
+  static clearHeaderDiv = () => {
+    while (this.headerDiv.firstChild) {
+      this.headerDiv.removeChild(this.headerDiv.firstChild)
+    }
+  }
+
+  static clearCardContainer = () => {
+    while (this.cardContainer.firstChild) {
+      this.cardContainer.removeChild(this.cardContainer.firstChild)
+    }
+  }
+
+  static clearInfoContainer = () => {
+    while (this.infoContainer.firstChild) {
+      this.infoContainer.removeChild(this.infoContainer.firstChild)
+    }
+  }
 
   static loadLandingPage = () => {
     this.nav.innerHTML = ""
-    this.container.innerHTML = SessionTemplates.landingPageHtml()
+    this.container.prepend(SessionTemplates.landingPageHtml())
     this.preloginStyling()
     this.setAuthLinkListeners()
   }
@@ -17,13 +44,15 @@ class SessionAdapter {
   
   static loadLoginPage = (e) => {
     e.preventDefault()
-    this.container.innerHTML = SessionTemplates.loginHtml()
+    this.container.firstChild.remove() 
+    this.container.prepend(SessionTemplates.loginHtml())
     document.querySelector('#login-form').addEventListener('submit', this.attemptLogin)
   }
   
   static loadSignupPage = (e) => {
     e.preventDefault()
-    this.container.innerHTML = SessionTemplates.signupHtml()
+    this.container.firstChild.remove()
+    this.container.prepend(SessionTemplates.signupHtml())
     document.querySelector('#signup-form').addEventListener('submit', this.attemptSignup)
   }
   
@@ -68,27 +97,33 @@ class SessionAdapter {
       if (json.error) {
         document.querySelector('#error-div').innerHTML = json.error
       } else {
-        this.loadDashboard()
+        this.loadDashboard(e)
       }
     })
   }
 
-  static loadDashboard = () => {
+  static loadDashboard = (e) => {
     this.loadNavbar()
+    if (e.target.tagName === 'FORM') {
+      e.target.remove()
+    }
+    this.clearAll()
     this.postLoginStyling()
     fetch(`${this.baseURL}/dashboard`, {credentials: 'include'})
     .then(resp => resp.json())
     .then(json => {
-      this.container.innerHTML = json.content
+      console.log(json)
     })
   }
 
   static loadNavbar = () => {
-    this.nav.classList = "navbar navbar-expand-lg navbar-light bg-light"
-    this.nav.innerHTML = SessionTemplates.navbarHtml()
-    document.querySelector('#dashboard-link').addEventListener('click', this.loadDashboard)
-    document.querySelector('#games-link').addEventListener('click', UserGameAdapter.loadMyGamesPage)
-    document.querySelector('#logout-button').addEventListener('click', this.logout)
+    if (!this.nav.hasChildNodes()) {
+      this.nav.classList = "navbar navbar-expand-lg navbar-light bg-light"
+      this.nav.append(SessionTemplates.navbarHtml())
+      document.querySelector('#dashboard-link').addEventListener('click', this.loadDashboard)
+      document.querySelector('#games-link').addEventListener('click', UserGameAdapter.loadMyGamesPage)
+      document.querySelector('#logout-button').addEventListener('click', this.logout)
+    }
   }
   
   static preloginStyling = () => {

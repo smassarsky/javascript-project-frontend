@@ -10,22 +10,20 @@ class UserGameAdapter {
     .then(resp => resp.json())
     .then(userGamesJson => {
       userGamesJson.forEach(userGame => new UserGame(userGame))
+      SessionAdapter.clearCardContainer()
+      SessionAdapter.clearInfoContainer()
       this.appendUserGames()
       this.setIndexListeners()
     })
   }
 
   static appendUserGames() {
-    this.container.innerHTML = UserGameTemplates.myGamesHtml()
-    const cardsContainer = document.querySelector('#cards-container')
-    UserGame.all.forEach(userGame => cardsContainer.appendChild(userGame.gameCard))
+    SessionAdapter.headerDiv.innerHTML = UserGameTemplates.myGamesHeaderHtml()
+    UserGame.all.forEach(userGame => SessionAdapter.cardContainer.appendChild(userGame.gameCard))
   }
 
   static setIndexListeners() {
     document.querySelector('#add-game-button').addEventListener('click', GameAdapter.loadAddGamePage)
-    document.querySelectorAll('.user-game-card').forEach((card) => {
-      card.addEventListener('click', this.loadShowUserGamePage)
-    })
   }
 
   static addToCollection = (e) => {
@@ -53,7 +51,7 @@ class UserGameAdapter {
   }
 
   static loadShowUserGamePage = (e) => {
-    const userGame = UserGame.findById(parseInt(e.currentTarget.dataset.userGameId))
+    const userGame = UserGame.findById(e.currentTarget.dataset.userGameId)
     console.log(e.currentTarget, userGame)
     fetch(`${this.baseURL}/${userGame.id}`, { credentials: 'include' })
     .then(resp => {
@@ -65,11 +63,8 @@ class UserGameAdapter {
     })
     .then(json => {
       if (json) {
-
-        
         userGame.update(json)
-        this.container.innerHTML = ""
-        this.container.append(userGame.userGameShowContainer)
+        userGame.loadShowPage()
       }
     })
   }

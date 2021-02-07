@@ -31,7 +31,7 @@ class LoadoutItemAdapter {
         const newLoadoutItem = loadout.addLoadoutItem(json)
         console.log(newLoadoutItem)
         target.remove()
-        loadout.loadoutItemTableHolder.prepend(newLoadoutItem.tableDiv)
+        loadout.tableBody.prepend(newLoadoutItem.tableRow)
         loadout.success("Loadout Item Added!")
       } else {
         loadout.failure(json.error)
@@ -90,7 +90,7 @@ class LoadoutItemAdapter {
     .then(json => {
       if (!json.error) {
         loadoutItem.update(json)
-        e.target.replaceWith(loadoutItem.tableDiv)
+        e.target.replaceWith(loadoutItem.tableRow)
         loadoutItem.success("Item Updated!")
       } else {
         loadoutItem.failure(json.error)
@@ -105,10 +105,10 @@ class LoadoutItemAdapter {
   static loadoutItemTableSwitcher = (e) => {
     switch (true) {
       case (e.target.classList.contains("new-loadout-item-button")):
-        LoadoutItemTemplates.newForm(e.target.dataset.loadoutId)
+        LoadoutItem.newForm(e.target.dataset.loadoutId)
         break
       case (e.target.classList.contains("existing-loadout-item-button")):
-        LoadoutItemTemplates.addExistingForm(e.target.dataset.loadoutId)
+        LoadoutItem.existingForm(e.target.dataset.loadoutId)
         console.log("make existing loadout item")
         break
       case (e.target.classList.contains("remove-form-button")):
@@ -136,16 +136,17 @@ class LoadoutItemAdapter {
     }
   }
 
+
   static editRow = (id) => {
     const loadoutItemToEdit = LoadoutItem.findById(id)
     console.log(loadoutItemToEdit, id)
     loadoutItemToEdit.resetMessages()
-    loadoutItemToEdit.tableDiv.replaceWith(loadoutItemToEdit.renderEditForm())
+    loadoutItemToEdit.tableRow.replaceWith(loadoutItemToEdit.renderEditForm())
   }
 
   static removeEditRow = (loadoutItemId) => {
     const targetLoadoutItem = LoadoutItem.findById(loadoutItemId)
-    targetLoadoutItem.editForm.replaceWith(targetLoadoutItem.tableDiv)
+    targetLoadoutItem.editForm.replaceWith(targetLoadoutItem.tableRow)
   }
 
   static deleteLoadoutItem = (id) => {
@@ -160,7 +161,7 @@ class LoadoutItemAdapter {
     .then(json => {
       if (!json.error) {
         loadoutItemToDelete.success("Loadout Item Deleted")
-        loadoutItemToDelete.tableDiv.remove()
+        loadoutItemToDelete.tableRow.remove()
         loadoutItemToDelete.destroy()
       } else {
         loadoutItemToDelete.failure(json.error)

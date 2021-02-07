@@ -1,13 +1,7 @@
 class LoadoutItemTemplates {
 
-  static newForm = (loadoutId) => {
-    const loadout = Loadout.findById(loadoutId)
-    const newLoadoutItemForm = document.createElement('form')
-
-    newLoadoutItemForm.id = `loadout-item-form-${loadout.id}-${loadout.formCounter}`
-    newLoadoutItemForm.dataset.loadoutId = loadout.id
-    newLoadoutItemForm.innerHTML = 
-    `
+  static newFormHtml = (loadout) => {
+    return `
       <table class="table mb-0 text-center">
         <tr>
           <td class="col-3">
@@ -29,9 +23,6 @@ class LoadoutItemTemplates {
         </tr>
       </table>
     `
-    newLoadoutItemForm.addEventListener('submit', LoadoutItemAdapter.addLoadoutItemNew)
-    loadout.loadoutItemTableHolder.prepend(newLoadoutItemForm)
-    loadout.formCounter++
   }
 
   static editForm = (loadoutItem) => {
@@ -65,15 +56,8 @@ class LoadoutItemTemplates {
     return newEditForm
   }
 
-  static addExistingForm = (loadoutId) => {
-
-    const loadout = Loadout.findById(loadoutId)
-    const existingForm = document.createElement('form')
-    existingForm.id = `loadout-item-form-${loadout.id}-${loadout.formCounter}`
-    existingForm.counter = loadout.formCounter
-    existingForm.dataset.loadoutId = loadout.id
-    existingForm.innerHTML = 
-    `
+  static existingFormHtml = (loadout) => {
+    return `
       <table class="table mb-0 text-center">
         <tr>
           <td class="col-3">
@@ -93,21 +77,6 @@ class LoadoutItemTemplates {
         </tr>
       </table>
     `
-    existingForm.addEventListener('submit', LoadoutItemAdapter.addLoadoutItemExisting)
-    loadout.loadoutItemTableHolder.prepend(existingForm)
-
-    const dropDown = document.querySelector(`#existing-item-name-${loadout.id}-${loadout.formCounter}`)
-
-    ItemAdapter.fetchUserGameItemsTruncated(loadout.userGame)
-    .then(() => {
-      loadout.userGame.items.forEach(item => dropDown.appendChild(item.optionElement()))
-      dropDown.addEventListener('change', (e) => {
-        console.log(e)
-        const item = Item.findById(parseInt(e.target.value))
-        document.querySelector(`#existing-item-note-${e.target.dataset.counter}`).innerHTML = item.note
-      })
-    })
-    this.formCounter++
   }
 
 }
