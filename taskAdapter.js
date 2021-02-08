@@ -1,5 +1,5 @@
-class TaskAdapter {
+// class TaskAdapter {
 
 
   
-}
+// }

@@ -39,7 +39,6 @@ class IngredientAdapter {
 
   static addNew = (e) => {
     e.preventDefault()
-    console.log(e, this)
     const item = Item.findById(e.target.dataset.itemId)
     this.createIngredient({
       item: item,
@@ -53,7 +52,6 @@ class IngredientAdapter {
 
   static addExisting = (e) => {
     e.preventDefault()
-    console.log(e.target)
     const item = Item.findById(e.target.dataset.itemId)
     this.createIngredient({
       item: item,
@@ -115,15 +113,14 @@ class IngredientAdapter {
     })
   }
 
+  // from loadoutitem table in loadout show page
   static switcher = (e) => {
     switch (e.target.dataset.buttonType) {
       case ('edit'):
         Ingredient.findById(e.target.dataset.ingredientId).renderEditForm()
-        console.log('TODO Edit ingredient')
         break
       case ('delete'):
         this.destroy(e)
-        console.log('TODO delete ingredient')
         break
       case ('remove-form'):
         this.removeForm(e)

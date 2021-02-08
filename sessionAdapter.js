@@ -30,8 +30,14 @@ class SessionAdapter {
     }
   }
 
+  static clearNav = () => {
+    while (this.nav.firstChild) {
+      this.nav.removeChild(this.nav.firstChild)
+    }
+  }
+
   static loadLandingPage = () => {
-    this.nav.innerHTML = ""
+    this.clearNav()
     this.container.prepend(SessionTemplates.landingPageHtml())
     this.preloginStyling()
     this.setAuthLinkListeners()
@@ -56,6 +62,30 @@ class SessionAdapter {
     document.querySelector('#signup-form').addEventListener('submit', this.attemptSignup)
   }
   
+  static loadDashboard = (e) => {
+    this.loadNavbar()
+    if (e.target.tagName === 'FORM') {
+      e.target.remove()
+    }
+    this.clearAll()
+    this.postLoginStyling()
+    fetch(`${this.baseURL}/dashboard`, {credentials: 'include'})
+    .then(resp => resp.json())
+    .then(json => {
+      console.log(json)
+    })
+  }
+
+  static loadNavbar = () => {
+    if (!this.nav.hasChildNodes()) {
+      this.nav.classList = "navbar navbar-expand-lg navbar-light bg-light"
+      this.nav.append(SessionTemplates.navbarHtml())
+      document.querySelector('#dashboard-link').addEventListener('click', this.loadDashboard)
+      document.querySelector('#games-link').addEventListener('click', UserGameAdapter.loadMyGamesPage)
+      document.querySelector('#logout-button').addEventListener('click', this.logout)
+    }
+  }
+
   static attemptSignup = (e) => {
     e.preventDefault()
     const login_params = {'user': {'username': e.target.username.value, 
@@ -75,7 +105,7 @@ class SessionAdapter {
       if (json.error) {
         document.querySelector('#error-div').innerHTML = json.error
       } else {
-        this.loadDashboard()
+        this.loadDashboard(e)
       }
     })
   }
@@ -101,31 +131,23 @@ class SessionAdapter {
       }
     })
   }
-
-  static loadDashboard = (e) => {
-    this.loadNavbar()
-    if (e.target.tagName === 'FORM') {
-      e.target.remove()
-    }
-    this.clearAll()
-    this.postLoginStyling()
-    fetch(`${this.baseURL}/dashboard`, {credentials: 'include'})
-    .then(resp => resp.json())
-    .then(json => {
-      console.log(json)
+  
+  static logout = () => {
+    fetch(`${this.baseURL}/logout`, {
+      method: 'DELETE', 
+      credentials: 'include'
+    })
+    .then(() => {
+      this.clearAll()
+      this.destroyAll()
+      this.loadLandingPage()
     })
   }
 
-  static loadNavbar = () => {
-    if (!this.nav.hasChildNodes()) {
-      this.nav.classList = "navbar navbar-expand-lg navbar-light bg-light"
-      this.nav.append(SessionTemplates.navbarHtml())
-      document.querySelector('#dashboard-link').addEventListener('click', this.loadDashboard)
-      document.querySelector('#games-link').addEventListener('click', UserGameAdapter.loadMyGamesPage)
-      document.querySelector('#logout-button').addEventListener('click', this.logout)
-    }
+  static destroyAll = () => {
+    [UserGame, Task, Loadout, LoadoutItem, Item, Ingredient, Game, Company].forEach(thing => thing.all = [])
   }
-  
+
   static preloginStyling = () => {
     document.querySelector('html').classList.add('h-100')
     document.querySelector('body').classList.add('h-100', 'body-login-styling')
@@ -135,14 +157,6 @@ class SessionAdapter {
   static postLoginStyling = () => {
     document.querySelector('html').classList.remove('h-100')
     document.querySelector('body').classList.remove('h-100', 'body-login-styling')
-  }
-
-  static logout = () => {
-    fetch(`${this.baseURL}/logout`, {
-      method: 'DELETE', 
-      credentials: 'include'
-    })
-    .then(this.loadLandingPage)
   }
 
 }

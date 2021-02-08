@@ -86,44 +86,9 @@ class UserGame {
     SessionAdapter.cardContainer.append(this.gameCard)
     SessionAdapter.clearInfoContainer()
     SessionAdapter.infoContainer.classList.add('row')
-    SessionAdapter.infoContainer.append(this.tasksDiv, this.loadoutsDiv)
+    SessionAdapter.infoContainer.append(this.loadoutsDiv)
+    //this.tasksDiv, 
   }
-
-  // get showPage() {
-  //   return this._showPage = this._showPage || this.renderShowPage()
-  // }
-
-
-  // renderShowPage = () => {
-  //   const showPage = document.createElement('div')
-  //   showPage.id = `user-game-show-page-${this.id}`
-  //   showPage.append(this.cardContainer, this.infoContainer)
-  //   return showPage
-  // }
-
-  // get cardContainer() {
-  //   return this._cardContainer = this._cardContainer || this.renderCardContainer()
-  // }
-
-  // renderCardContainer = () => {
-  //   const cardContainer = document.createElement('div')
-  //   cardContainer.id = `card-container-${this.id}`
-  //   cardContainer.classList.add('row', 'row-cols-2', 'row-cols-md-4', 'row-cols-lg-6', 'g-4', 'justify-content-center', 'my-3')
-  //   cardContainer.append(this.gameCard)
-  //   return cardContainer
-  // }
-
-  // get infoContainer() {
-  //   return this._infoContainer = this._infoContainer || this.renderInfoContainer()
-  // }
-
-  // renderInfoContainer = () => {
-  //   const infoContainer = document.createElement('div')
-  //   infoContainer.id = `user-game-info-container-${this.id}`
-  //   infoContainer.classList.add('row')
-  //   infoContainer.append(this.tasksDiv, this.loadoutsDiv)
-  //   return infoContainer
-  // }
 
   get tasksDiv() {
     return this._tasksDiv = this._tasksDiv || this.renderTasksDiv()
@@ -250,25 +215,6 @@ class UserGame {
     noLoadoutsHolder.classList.add('table', 'text-center', 'mb-0')
     noLoadoutsHolder.innerHTML = "<tbody><tr><td>No Loadouts Created Yet</td></tr></tbody>"
     return noLoadoutsHolder
-  }
-
-  renderTasksTable() {
-    return `
-      <div class="text-center">
-        <h3>Tasks</h3>
-        <button id="new-task-button" data-user-game-id="${this.id}" class="btn btn-primary">New Task</button>
-      </div>
-      <table class="table text-center">
-        <thead>
-          <tr>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${(this.tasks.length > 0) ? this.tasks.map(task => task.tableRow()).join("") : "<tr id='no-task-holder'><td>No Tasks created yet</td></tr>"}
-        </tbody>
-      </table>
-    `
   }
 
   get gameCard() {

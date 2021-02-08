@@ -29,7 +29,6 @@ class LoadoutItemAdapter {
     .then(json => {
       if (!json.error) {
         const newLoadoutItem = loadout.addLoadoutItem(json)
-        console.log(newLoadoutItem)
         target.remove()
         loadout.tableBody.prepend(newLoadoutItem.tableRow)
         loadout.success("Loadout Item Added!")
@@ -98,6 +97,26 @@ class LoadoutItemAdapter {
     })
   }
 
+  static deleteLoadoutItem = (id) => {
+    const loadoutItemToDelete = LoadoutItem.findById(id)
+    loadoutItemToDelete.resetMessages()
+    
+    fetch(`${this.baseURL}/${id}`, {
+      method: "DELETE",
+      credentials: "include"
+    })
+    .then(resp => resp.json())
+    .then(json => {
+      if (!json.error) {
+        loadoutItemToDelete.success("Loadout Item Deleted")
+        loadoutItemToDelete.tableRow.remove()
+        loadoutItemToDelete.destroy()
+      } else {
+        loadoutItemToDelete.failure(json.error)
+      }
+    })
+  }
+
   static removeLoadoutItemForm = (e) => {
     document.querySelector(`#loadout-item-form-${e.target.dataset.counter}`).remove()
   }
@@ -124,7 +143,6 @@ class LoadoutItemAdapter {
       case ('remove-form'):
         this.removeLoadoutItemForm(e)
         break
-
       case ('edit'):
         this.editRow(e.target.dataset.loadoutItemId)
         break
@@ -134,15 +152,11 @@ class LoadoutItemAdapter {
       case ('delete'):
         this.deleteLoadoutItem(e.target.dataset.loadoutItemId)
         break
-
-
     }
   }
 
-
   static editRow = (id) => {
     const loadoutItemToEdit = LoadoutItem.findById(id)
-    console.log(loadoutItemToEdit, id)
     loadoutItemToEdit.resetMessages()
     loadoutItemToEdit.tableRow.replaceWith(loadoutItemToEdit.renderEditForm())
   }
@@ -150,26 +164,6 @@ class LoadoutItemAdapter {
   static removeEditRow = (loadoutItemId) => {
     const targetLoadoutItem = LoadoutItem.findById(loadoutItemId)
     targetLoadoutItem.editForm.replaceWith(targetLoadoutItem.tableRow)
-  }
-
-  static deleteLoadoutItem = (id) => {
-    const loadoutItemToDelete = LoadoutItem.findById(id)
-    loadoutItemToDelete.resetMessages()
-    
-    fetch(`${this.baseURL}/${id}`, {
-      method: "DELETE",
-      credentials: "include"
-    })
-    .then(resp => resp.json())
-    .then(json => {
-      if (!json.error) {
-        loadoutItemToDelete.success("Loadout Item Deleted")
-        loadoutItemToDelete.tableRow.remove()
-        loadoutItemToDelete.destroy()
-      } else {
-        loadoutItemToDelete.failure(json.error)
-      }
-    })
   }
 
 }

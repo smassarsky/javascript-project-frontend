@@ -56,7 +56,7 @@ class SessionTemplates {
   static signupHtml = () => {
     const signupForm = document.createElement('form')
     signupForm.id = "signup-form"
-    signupForm.classList.add('form-signin text-center')
+    signupForm.classList.add('form-signin', 'text-center')
     signupForm.innerHTML = `
       <h1 class="h3 mb-3 font-weight-normal">Sign Up</h1>
       <div id="error-div" class="text-danger mb-3"></div>

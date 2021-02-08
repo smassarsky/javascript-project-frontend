@@ -6,7 +6,6 @@ class Ingredient {
   static findIndexById = (id) => this.all.findIndex(ingredient => ingredient.id === parseInt(id))
 
   constructor({item, json: { id, quantity, reagent }}) {
-    console.log(id, quantity, item, reagent)
     const checkFirst = Ingredient.findById(id)
     if (!checkFirst) {
       this.id = id
@@ -17,7 +16,7 @@ class Ingredient {
       Ingredient.all.push(this)
       return this
     } else {
-      checkFirst.update({quantity, item})
+      checkFirst.update({quantity, reagent})
       return checkFirst
     }
   }
@@ -31,11 +30,10 @@ class Ingredient {
   }
 
   update = ({quantity, reagent}) => {
-    console.log(quantity, reagent)
     if (quantity && quantity != this.quantity) {
       this.quantity = quantity
     }
-    this.item.update(reagent)
+    this.reagent.update(reagent)
     return this
   }
 

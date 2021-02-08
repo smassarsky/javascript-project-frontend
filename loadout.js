@@ -3,7 +3,6 @@ class Loadout {
   static all = []
 
   static findById = (id) => Loadout.all.find(loadout => loadout.id === parseInt(id))
-  
   static findIndexById = (id) => Loadout.all.findIndex(loadout => loadout.id === parseInt(id))
   
   constructor({id, name, loadoutItems = [], userGame}) {
@@ -18,7 +17,6 @@ class Loadout {
       this.initialFetch = false
 
       loadoutItems.forEach(function(loadoutItem) {
-        console.log(this)
         this.loadoutItems.push(new LoadoutItem(Object.assign(loadoutItem, {loadout: this})))
       }, this)
       Loadout.all.push(this)
@@ -30,7 +28,6 @@ class Loadout {
   }
 
   update = ({name, loadoutItems = []}) => {
-    console.log(loadoutItems)
     if (name) {
       this.name = name
     }

@@ -52,7 +52,6 @@ class UserGameAdapter {
 
   static loadShowUserGamePage = (e) => {
     const userGame = UserGame.findById(e.currentTarget.dataset.userGameId)
-    console.log(e.currentTarget, userGame)
     fetch(`${this.baseURL}/${userGame.id}`, { credentials: 'include' })
     .then(resp => {
       if (resp.ok) {

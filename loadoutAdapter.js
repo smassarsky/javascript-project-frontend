@@ -43,56 +43,6 @@ class LoadoutAdapter {
     })
   }
 
-  static loadoutTableSwitcher = (e) => {
-    
-    switch(true) {
-      case e.target.classList.contains("new-loadout-button"):
-        e.preventDefault()
-        this.newLoadoutFormRow(e.target.dataset.userGameId)
-        break
-      case e.target.classList.contains("remove-button"):
-        e.preventDefault()
-        this.removeFormRow(e.target.dataset.counter)
-        break
-      case e.target.classList.contains("show-button"):
-        Loadout.findById(e.target.dataset.loadoutId).loadShowPage()
-        break
-      case e.target.classList.contains("edit-button"):
-        e.preventDefault()
-        this.editNameRow(e.target.dataset.loadoutId)
-        break
-      case e.target.classList.contains("delete-button"):
-        e.preventDefault()
-        this.deleteLoadout(e.target.dataset.loadoutId)
-        break
-      case e.target.classList.contains("cancel-edit-button"):
-        e.preventDefault()
-        this.cancelEditForm(e.target.dataset.loadoutId)
-        break
-    }
-  }
-
-  static switcher(e) {
-    switch (e.target.dataset.buttonType) {
-      case ('new'):
-        LoadoutItem.newForm(e.target.dataset.loadoutId)
-        break
-      case ('existing'):
-        LoadoutItem.existingForm(e.target.dataset.loadoutId)
-        break
-      case ('remove-form'):
-        LoadoutItemAdapter.removeLoadoutItemForm(e)
-        break
-    }
-  }
-
-  static editNameRow(id) {
-    const loadout = Loadout.findById(id)
-    const div = document.querySelector(`#user-game-loadout-div-${id}`)
-    div.innerHTML = ""
-    div.append(loadout.editLoadoutNameForm())
-  }
-
   static editLoadoutName = (e) => {
     e.preventDefault()
     const loadout = Loadout.findById(parseInt(e.target.dataset.loadoutId))
@@ -136,6 +86,7 @@ class LoadoutAdapter {
     })
   }
 
+  // related to show page load
   static fetchItemsAndIngredients = (loadout) => {
     if (!loadout.initialFetch) {
       return fetch(`${this.baseURL}/${loadout.id}/loadout_items`, { credentials: 'include' })
@@ -152,6 +103,59 @@ class LoadoutAdapter {
       return Promise.resolve(42)
     }
   }
+
+  static loadoutTableSwitcher = (e) => {
+    
+    switch(true) {
+      case e.target.classList.contains("new-loadout-button"):
+        e.preventDefault()
+        this.newLoadoutFormRow(e.target.dataset.userGameId)
+        break
+      case e.target.classList.contains("remove-button"):
+        e.preventDefault()
+        this.removeFormRow(e.target.dataset.counter)
+        break
+      case e.target.classList.contains("show-button"):
+        Loadout.findById(e.target.dataset.loadoutId).loadShowPage()
+        break
+      case e.target.classList.contains("edit-button"):
+        e.preventDefault()
+        this.editNameRow(e.target.dataset.loadoutId)
+        break
+      case e.target.classList.contains("delete-button"):
+        e.preventDefault()
+        this.deleteLoadout(e.target.dataset.loadoutId)
+        break
+      case e.target.classList.contains("cancel-edit-button"):
+        e.preventDefault()
+        this.cancelEditForm(e.target.dataset.loadoutId)
+        break
+    }
+  }
+
+  // related to loadoutitem table in show page
+  static switcher(e) {
+    switch (e.target.dataset.buttonType) {
+      case ('new'):
+        LoadoutItem.newForm(e.target.dataset.loadoutId)
+        break
+      case ('existing'):
+        LoadoutItem.existingForm(e.target.dataset.loadoutId)
+        break
+      case ('remove-form'):
+        LoadoutItemAdapter.removeLoadoutItemForm(e)
+        break
+    }
+  }
+
+  static editNameRow(id) {
+    const loadout = Loadout.findById(id)
+    const div = document.querySelector(`#user-game-loadout-div-${id}`)
+    div.innerHTML = ""
+    div.append(loadout.editLoadoutNameForm())
+  }
+
+
 
   static resetItemTableMessages() {
     document.querySelector('#loadout-item-success-div').innerHTML = ""

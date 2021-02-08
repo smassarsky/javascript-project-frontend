@@ -34,21 +34,16 @@ class ItemAdapter {
     })
   }
 
-  static editItem = (e) => {
-    e.preventDefault()
-    console.log("edit item")
-  }
-
   static removeItemForm = (e) => {
     e.preventDefault()
     document.querySelector(`#new-item-form-${e.target.dataset.counter}`).remove()
   }
 
+  // from loadoutitem table
   static switcher = (e) => {
     switch (e.target.dataset.buttonType) {
       case ('new-ingredient'):
         Item.findById(e.target.dataset.itemId).newIngredientForm()
-        console.log("TODO new ingredient")
         break
       case ('existing-ingredient'):
         Item.findById(e.target.dataset.itemId).existingIngredientForm()
@@ -69,23 +64,7 @@ class ItemAdapter {
     document.querySelector('#item-table-body').prepend(targetItem.itemTableRow())
   }
 
-  static deleteItem = (id) => {
-    const itemToDelete = Item.findById(parseInt(id))
-    fetch(`${this.baseURL}/${id}`, {
-      method: "DELETE",
-      credentials: "include"
-    })
-    .then(resp => resp.json())
-    .then(json => {
-      if (!json.error) {
-        document.querySelector('#item-success-div').innerHTML = "Item Deleted"
-        document.querySelector(`#item-row-${itemToDelete.id}`).remove()
-        itemToDelete.destroy()
-      } else {
 
-      }
-    })
-  }
 
   static resetMessages() {
     document.querySelector('#item-success-div').innerHTML = ""

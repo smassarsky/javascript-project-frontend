@@ -12,7 +12,7 @@ class LoadoutItem {
       this.quantity = quantity
       this.loadout = loadout
       this.item = new Item(Object.assign(item, {userGame: loadout.userGame}))
-
+      this.userGame.addItem(this.item)
       LoadoutItem.all.push(this)
       return this
     } else {
@@ -26,6 +26,9 @@ class LoadoutItem {
       this.quantity = quantity
     }
     this.item = new Item(item)
+    if (this._tableRow) {
+      this.reRenderTableRow()
+    }
     return this
   }
 
@@ -67,7 +70,7 @@ class LoadoutItem {
     while (this._tableRow.firstChild) {
       this._tableRow.removeChild(this._tableRow.firstChild)
     }
-    this._tableRow.append()
+    this._tableRow.append(this.reRenderDetails(), this.ingredientsDiv)
   }
 
   renderTableRow = () => {
@@ -82,6 +85,10 @@ class LoadoutItem {
 
   get details() {
     return this._details = this._details || this.renderDetails()
+  }
+
+  reRenderDetails = () => {
+    return this._details = this.renderDetails()
   }
 
   renderDetails = () => {
@@ -153,7 +160,7 @@ class LoadoutItem {
         document.querySelector(`#existing-item-note-${e.target.dataset.counter}`).innerHTML = item.note
       })
     })
-    this.formCounter++
+    loadout.formCounter++
   }
 
 }

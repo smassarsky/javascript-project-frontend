@@ -70,7 +70,6 @@ class Item {
   }
 
   addIngredient = (ingredientJson) => {
-    console.log(ingredientJson)
     const checkFirst = this.findIngredientById(ingredientJson.id)
     if (!checkFirst) {
       const newIngredient = new Ingredient({item: this, json: ingredientJson})

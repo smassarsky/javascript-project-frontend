@@ -4,6 +4,7 @@ class GameAdapter {
 
   static loadAddGamePage = (e) => {
     e.preventDefault()
+    SessionAdapter.clearAll()
     this.fetchAllGames()
   }
 
@@ -23,7 +24,7 @@ class GameAdapter {
   }
 
   static loadSkeleton = () => {
-    this.container.innerHTML = GameTemplates.indexHtml()
+    SessionAdapter.infoContainer.innerHTML = GameTemplates.indexHtml()
   }
 
   static populateDatalist = () => {
