@@ -10,7 +10,7 @@ class LoadoutItemTemplates {
           </td>
           <td class="col-2">
             <label for="new-loadout-item-quantity-${loadout.id}-${loadout.formCounter}" class="visually-hidden">New Loadout Item Quantity</label>
-            <input id="new-loadout-item-quantity-${loadout.id}-${loadout.formCounter}" class="form-control" type="number" name="quantity" placeholder="0" min="0">
+            <input id="new-loadout-item-quantity-${loadout.id}-${loadout.formCounter}" class="form-control" type="number" name="quantity" value="1" min="1">
           </td>
           <td class="col-4">
             <label for="new-loadout-item-note-${loadout.id}-${loadout.formCounter}" class="visually-hidden">New Loadout Item Note</label>
@@ -25,12 +25,8 @@ class LoadoutItemTemplates {
     `
   }
 
-  static editForm = (loadoutItem) => {
-    const newEditForm = document.createElement('form')
-    newEditForm.id = `edit-loadout-item-form-${loadoutItem.id}`
-    newEditForm.dataset.loadoutItemId = `${loadoutItem.id}`
-    newEditForm.innerHTML = 
-    `
+  static editFormHtml = (loadoutItem) => {
+    return `
       <table class="table mb-0 text-center">
         <tr>
           <td class="col-3">
@@ -38,8 +34,8 @@ class LoadoutItemTemplates {
             <input id="edit-loadout-item-name-${loadoutItem.id}" class="form-control" type="text" name="name" placeholder="Name" value="${loadoutItem.name}">
           </td>
           <td class="col-2">
-            <label for="edit-loadout-item-quantity-${loadoutItem.id}" class="visually-hidden">Edit Loadout Item Name</label>
-            <input id="edit-loadout-item-quantity-${loadoutItem.id}" class="form-control" type="number" name="quantity" placeholder="0" min="0" value="${loadoutItem.quantity}">
+            <label for="edit-loadout-item-quantity-${loadoutItem.id}" class="visually-hidden">Edit Loadout Item Quantity</label>
+            <input id="edit-loadout-item-quantity-${loadoutItem.id}" class="form-control" type="number" name="quantity" min="1" value="${loadoutItem.quantity}">
           </td>
           <td class="col-4">
             <label for="edit-loadout-item-note-${loadoutItem.id}" class="visually-hidden">Edit Loadout Item Note</label>
@@ -52,8 +48,6 @@ class LoadoutItemTemplates {
         </tr>
       </table>
     `
-    newEditForm.addEventListener('submit', LoadoutItemAdapter.editLoadoutItem)
-    return newEditForm
   }
 
   static existingFormHtml = (loadout) => {
@@ -66,7 +60,7 @@ class LoadoutItemTemplates {
           </td>
           <td class="col-2">
             <label for="loadout-item-quantity-${loadout.id}-${loadout.formCounter}" class="visually-hidden">Loadout Item Quantity</label>
-            <input id="loadout-item-quantity-${loadout.id}-${loadout.formCounter}" class="form-control" type="number" name="quantity" placeholder="0" min="0">
+            <input id="loadout-item-quantity-${loadout.id}-${loadout.formCounter}" class="form-control" type="number" name="quantity" value="1" min="1">
           </td>
           <td id="existing-item-note-${loadout.id}-${loadout.formCounter}" class="col-4">
           </td>
@@ -85,7 +79,7 @@ class LoadoutItemTemplates {
         <td class="col-3">${loadoutItem.name}</td>
         <td class="col-2">${loadoutItem.quantity}</td>
         <td class="col-4">${loadoutItem.note}</td>
-        <td class="col-3">${loadoutItem.optionButtons()}</td>
+        <td class="col-3">${this.tableOptionButtons(loadoutItem)}</td>
       </tr>
     `
   }

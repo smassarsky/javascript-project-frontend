@@ -20,7 +20,7 @@ class ItemTemplates {
           </td>
           <td class="col-2">
             <label for="new-item-quantity-${this.formCounter}" class="visually-hidden">New Item Quantity</label>
-            <input id="new-item-quantity-${this.formCounter}" class="form-control" type="number" name="quantity" placeholder="0" min="0">
+            <input id="new-item-quantity-${this.formCounter}" class="form-control" type="number" name="quantity" value="1" min="1">
           </td>
           <td class="col-4">
             <label for="new-item-note-${this.formCounter}" class="visually-hidden">New Item Note</label>
@@ -54,7 +54,7 @@ class ItemTemplates {
           </td>
           <td class="col-2">
             <label for="edit-item-quantity-${item.id}" class="visually-hidden">Edit Item Name</label>
-            <input id="edit-item-quantity-${item.id}" class="form-control" type="number" name="quantity" placeholder="0" min="0" value="${item.quantity}">
+            <input id="edit-item-quantity-${item.id}" class="form-control" type="number" name="quantity" min="1" value="${item.quantity}">
           </td>
           <td class="col-4">
             <label for="edit-item-note-${item.id}" class="visually-hidden">Edit Item Note</label>

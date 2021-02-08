@@ -12,6 +12,7 @@ class Ingredient {
       this.id = id
       this.quantity = quantity
       this.reagent = new Item(Object.assign(reagent, {userGame: item.userGame}))
+      this.reagent.addAsReagent(this)
       this.item = item
       Ingredient.all.push(this)
       return this
@@ -29,13 +30,27 @@ class Ingredient {
     return this.reagent.note
   }
 
-  update = ({quantity, item}) => {
-
+  update = ({quantity, reagent}) => {
+    console.log(quantity, reagent)
+    if (quantity && quantity != this.quantity) {
+      this.quantity = quantity
+    }
+    this.item.update(reagent)
     return this
+  }
+
+  destroy = () => {
+    this.item.removeIngredient(this)
+    Ingredient.all.splice(Ingredient.findIndexById(this.id), 1)
+    this.tableRow.remove()
   }
 
   get tableRow() {
     return this._tableRow = this._tableRow || this.renderTableRow()
+  }
+
+  reRenderTableRow = () => {
+    return this._tableRow = this.renderTableRow()
   }
 
   renderTableRow = () => {
@@ -46,6 +61,18 @@ class Ingredient {
     return tableRow
   }
 
+  renderEditForm = () => {
+    const newEditForm = document.createElement('form')
+    newEditForm.id = `edit-ingredient-form-${this.id}`
+    newEditForm.dataset.ingredientId = `${this.id}`
+    newEditForm.innerHTML = IngredientTemplates.editFormHtml(this)
+    newEditForm.addEventListener('submit', IngredientAdapter.update)
+    this.tableRow.replaceWith(newEditForm)
+    this.editForm = newEditForm 
+  }
 
+  cancelEditForm = () => {
+    this.editForm.replaceWith(this.tableRow)
+  }
   
 }

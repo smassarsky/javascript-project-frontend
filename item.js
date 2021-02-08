@@ -6,7 +6,7 @@ class Item {
 
   static findIndexById = (id) => Item.all.findIndex(item => item.id === parseInt(id))
 
-  constructor({id, name, note = "", ingredients = [], userGame, loadoutItem}) {
+  constructor({id, name="", note = "", ingredients = [], userGame, loadoutItem}) {
     const checkFirst = Item.findById(id)
     if (!checkFirst){
       this.id = id
@@ -15,6 +15,7 @@ class Item {
       this.userGame = userGame
       this.loadoutItems = loadoutItem ? [loadoutItem] : [] 
       this.ingredients = []
+      this.asReagents = []
       this.formCounter = 0
 
       if (ingredients && ingredients.length > 0) {
@@ -55,6 +56,9 @@ class Item {
   findIngredientById = (id) => this.ingredients.find(ingredient => ingredient.id === id)
   findIndexIngredientById = (id) => this.ingredients.findIndex(ingredient => ingredient.id === id)
 
+  findAsReagentById = (id) => this.asReagents.find(asReagent => asReagent.id === id)
+  findAsReagentIndexById = (id) => this.asReagents.findIndex(asReagent => asReagent.id === id)
+
   addLoadoutItem = (loadoutItem) => {
     if (!this.findLoadoutItemById(loadoutItem.id)) {
       this.loadoutItems.push()
@@ -77,9 +81,22 @@ class Item {
     }
   }
 
-  removeIngredient = (ingredientObj) => {
-    this.ingredients.splice(this.findIndexIngredientById(ingredientObj.id), 1)
-    ingredientObj.destroy()
+  removeIngredient = (ingredient) => {
+    this.ingredients.splice(this.findIndexIngredientById(ingredient.id), 1)
+  }
+
+  addAsReagent = (asReagent) => {
+    const checkFirst = this.findAsReagentById(asReagent.id)
+    if (!checkFirst) {
+      this.asReagents.push(asReagent)
+    }
+  }
+
+  removeAsReagent = (asReagent) => {
+    const test = this.findAsReagentIndexById(asReagent)
+    if (test >= 0) {
+      this.asReagents.splice(test, 1)
+    }
   }
 
   destroy = () => {
@@ -192,11 +209,33 @@ class Item {
 
   newIngredientForm = () => {
     const newForm = document.createElement('form')
-    newForm.id = `new-ingredient-form-${this.id}-${this.formCounter}`
+    newForm.id = `ingredient-form-${this.id}-${this.formCounter}`
     newForm.dataset.itemId = this.id
     newForm.innerHTML = IngredientTemplates.newForm(this)
     newForm.addEventListener('submit', IngredientAdapter.addNew)
     this.ingredientsTableRows.prepend(newForm)
+    this.formCounter++
+  }
+
+  existingIngredientForm = () => {
+    const existingForm = document.createElement('form')
+    existingForm.id = `ingredient-form-${this.id}-${this.formCounter}`
+    existingForm.dataset.itemId = this.id
+    existingForm.innerHTML = IngredientTemplates.existingForm(this)
+    existingForm.addEventListener('submit', IngredientAdapter.addExisting)
+    this.ingredientsTableRows.prepend(existingForm)
+
+    const dropDown = document.querySelector(`#existing-ingredient-name-${this.id}-${this.formCounter}`)
+
+    ItemAdapter.fetchUserGameItemsTruncated(this.userGame)
+    .then(() => {
+      this.userGame.items.forEach(item => dropDown.appendChild(item.optionElement()))
+      dropDown.addEventListener('change', (e) => {
+        const reagent = Item.findById(e.target.value)
+        document.querySelector(`#existing-ingredient-note-${e.target.dataset.counter}`).innerHTML = reagent.note
+      })
+    })
+
     this.formCounter++
   }
 

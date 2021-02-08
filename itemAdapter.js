@@ -98,8 +98,12 @@ class ItemAdapter {
       .then(resp => resp.json())
       .then(json => {
         json.forEach(itemJson => userGame.addItem(itemJson))
+        userGame.fetchedAllItems = true
         return json
       })
+    }
+    else {
+      return Promise.resolve()
     }
   }
 

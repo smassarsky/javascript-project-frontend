@@ -60,11 +60,14 @@ class LoadoutItem {
   //
 
   get tableRow() {
-    if (this._tableRow){
-      return this._tableRow
-    } else {
-      return this._tableRow = this.renderTableRow()
+    return this._tableRow = this._tableRow || this.renderTableRow()
+  }
+
+  reRenderTableRow = () => {
+    while (this._tableRow.firstChild) {
+      this._tableRow.removeChild(this._tableRow.firstChild)
     }
+    this._tableRow.append()
   }
 
   renderTableRow = () => {
@@ -110,8 +113,12 @@ class LoadoutItem {
   }
 
   renderEditForm = () => {
-    this.editForm = LoadoutItemTemplates.editForm(this)
-    return this.editForm
+    const newEditForm = document.createElement('form')
+    newEditForm.id = `edit-loadout-item-form-${this.id}`
+    newEditForm.dataset.loadoutItemId = `${this.id}`
+    newEditForm.innerHTML = LoadoutItemTemplates.editFormHtml(this)
+    newEditForm.addEventListener('submit', LoadoutItemAdapter.editLoadoutItem)
+    return this.editForm = newEditForm
   }
 
   static newForm = (loadoutId) => {
@@ -142,7 +149,7 @@ class LoadoutItem {
     .then(() => {
       loadout.userGame.items.forEach(item => dropDown.appendChild(item.optionElement()))
       dropDown.addEventListener('change', (e) => {
-        const item = Item.findById(parseInt(e.target.value))
+        const item = Item.findById(e.target.value)
         document.querySelector(`#existing-item-note-${e.target.dataset.counter}`).innerHTML = item.note
       })
     })

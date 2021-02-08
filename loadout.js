@@ -15,7 +15,7 @@ class Loadout {
       this.loadoutItems = []
       this.formCounter = 0
 
-
+      this.initialFetch = false
 
       loadoutItems.forEach(function(loadoutItem) {
         console.log(this)
@@ -86,7 +86,7 @@ class Loadout {
   editLoadoutNameForm = () => {
     const newEditLoadoutNameForm = document.createElement('form')
     newEditLoadoutNameForm.dataset.loadoutId = this.id
-    newEditLoadoutNameForm.innerHTML = LoadoutTemplates.editNameForm(this)
+    newEditLoadoutNameForm.innerHTML = LoadoutTemplates.editNameFormHtml(this)
 
     newEditLoadoutNameForm.addEventListener('submit', LoadoutAdapter.editLoadoutName)
     this.editLoadoutForm = newEditLoadoutNameForm
@@ -105,6 +105,18 @@ class Loadout {
   //      |tableBody
   //
 
+  loadShowPage = () => {
+    SessionAdapter.clearAll()
+    SessionAdapter.cardContainer.append(this.userGame.gameCard)
+    
+    LoadoutAdapter.fetchItemsAndIngredients(this)
+    .then(() => {
+      if (this._tableBody) {
+        this.reRenderTableBody()
+      }
+      SessionAdapter.infoContainer.append(this.showDiv)
+    })
+  }
 
   get showDiv() {
     return this._showDiv = this._showDiv || this.renderShowDiv()
@@ -177,9 +189,12 @@ class Loadout {
   }
 
   reRenderTableBody = () => {
-    const oldTableBody = this._tableBody
+    while (this._tableBody.firstChild) {
+      this._tableBody.removeChild(this._tableBody.firstChild)
+    }
+    this._tableBody.remove()
     this._tableBody = this.renderTableBody()
-    oldTableBody.replaceWith(this._tableBody)
+    this.loadoutItemContainer.append(this._tableBody)
   }
 
   renderTableBody = () => {

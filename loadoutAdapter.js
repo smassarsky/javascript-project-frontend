@@ -2,16 +2,8 @@ class LoadoutAdapter {
 
   static baseURL = `${SessionAdapter.baseURL}/loadouts`
 
-  // static newLoadoutPage = (e) => {
-  //   console.log(e.target, e.target.dataset.id, e.target.dataset.userGameId)
-  //   const userGame = UserGame.findById(parseInt(e.target.dataset.userGameId))
-  //   const infoContainer = document.querySelector('#user-game-info-container')
-  //   infoContainer.innerHTML = LoadoutTemplates.newLoadoutHtml(userGame)
-  //   document.querySelector('#new-loadout-form').addEventListener('submit', this.createNewLoadout)
-  // }
-
   static newLoadoutFormRow = (id) => {
-    const userGame = UserGame.findById(parseInt(id))
+    const userGame = UserGame.findById(id)
     const newLoadoutForm = document.createElement('form')
     newLoadoutForm.id = `new-loadout-form-${userGame.id}-${userGame.formCounter}`
     newLoadoutForm.dataset.userGameId = `${userGame.id}`
@@ -23,7 +15,7 @@ class LoadoutAdapter {
 
   static createNewLoadout = (e) => {
     e.preventDefault()
-    const userGame = UserGame.findById(parseInt(e.target.dataset.userGameId))
+    const userGame = UserGame.findById(e.target.dataset.userGameId)
     fetch(this.baseURL, {
       method: "POST",
       credentials: 'include',
@@ -63,8 +55,7 @@ class LoadoutAdapter {
         this.removeFormRow(e.target.dataset.counter)
         break
       case e.target.classList.contains("show-button"):
-        e.preventDefault()
-        this.loadoutShowPage(e.target.dataset.loadoutId)
+        Loadout.findById(e.target.dataset.loadoutId).loadShowPage()
         break
       case e.target.classList.contains("edit-button"):
         e.preventDefault()
@@ -145,26 +136,21 @@ class LoadoutAdapter {
     })
   }
 
-  static loadoutShowPage(id) {
-    const loadout = Loadout.findById(id)
-    SessionAdapter.clearInfoContainer()
-    SessionAdapter.infoContainer.append(loadout.showDiv)
-    this.fetchItemsAndIngredients(loadout)
-  }
-
-  static fetchItemsAndIngredients(loadout) {
-    fetch(`${this.baseURL}/${loadout.id}/loadout_items`, { credentials: 'include' })
-    .then(resp => resp.json())
-    .then(json => {
-      if (!json.error){
-        json['loadout_items'].forEach(loadoutItem => {
-          loadout.addLoadoutItem(loadoutItem)
-        })
-        loadout.reRenderTableBody()
-      } else {
-        console.error("error")
-      }
-    })
+  static fetchItemsAndIngredients = (loadout) => {
+    if (!loadout.initialFetch) {
+      return fetch(`${this.baseURL}/${loadout.id}/loadout_items`, { credentials: 'include' })
+      .then(resp => resp.json())
+      .then(json => {
+        if (!json.error) {
+          json['loadout_items'].forEach(loadoutItem => loadout.addLoadoutItem(loadoutItem))
+        } else {
+          console.error("error")
+        }
+        loadout.initialFetch = true
+      })
+    } else {
+      return Promise.resolve(42)
+    }
   }
 
   static resetItemTableMessages() {
